@@ -18,7 +18,7 @@ Log _$LogFromJson(Map<String, dynamic> json) {
     weightUnitId: json['weight_unit'] as int?,
     amount: stringToNum(json['amount'] as String?),
     planId: json['plan'] as int,
-    datetime: DateTime.parse(json['datetime'] as String),
+    datetime: const CustomDateTimeConverter().fromJson(json['datetime'] as String),
     comment: json['comment'] as String?,
   );
 }
@@ -27,7 +27,7 @@ Map<String, dynamic> _$LogToJson(Log instance) => <String, dynamic>{
       'id': instance.id,
       'meal': instance.mealId,
       'plan': instance.planId,
-      'datetime': instance.datetime.toIso8601String(),
+      'datetime': const CustomDateTimeConverter().toJson(instance.datetime),
       'comment': instance.comment,
       'ingredient': instance.ingredientId,
       'weight_unit': instance.weightUnitId,

@@ -35,6 +35,7 @@ class ScanReader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(automaticallyImplyLeading: true),
         body: ReaderWidget(
           onScan: (result) {
             scannedr = result.text;

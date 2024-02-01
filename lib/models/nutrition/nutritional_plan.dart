@@ -128,6 +128,48 @@ class NutritionalPlan {
     );
   }
 
+  List<Log> logsForToday() {
+    final List<Log> logsToday = [];
+    for (final log in logs) {
+      if (log.datetime.day == DateTime.now().day &&
+          log.datetime.month == DateTime.now().month &&
+          log.datetime.year == DateTime.now().year) {
+        logsToday.add(log);
+      }
+    }
+    return logsToday;
+  }
+
+  NutritionalValues getNutritionalValuesForMealsOrLogs() {
+    if (meals.isEmpty) {
+      double fat = 0;
+      double energy = 0;
+      double protein = 0;
+      double carbohydrates = 0;
+      double carbohydratesSugar = 0;
+      double fatSaturated = 0;
+      double fibres = 0;
+      double sodium = 0;
+      for (final log in logsForToday()) {
+        if (log.datetime.day == DateTime.now().day &&
+            log.datetime.month == DateTime.now().month &&
+            log.datetime.year == DateTime.now().year) {
+          fat += log.nutritionalValues.fat;
+          energy += log.nutritionalValues.energy;
+          protein += log.nutritionalValues.protein;
+          carbohydrates += log.nutritionalValues.carbohydrates;
+          carbohydratesSugar += log.nutritionalValues.carbohydratesSugar;
+          fatSaturated += log.nutritionalValues.fatSaturated;
+          fibres += log.nutritionalValues.fibres;
+          sodium += log.nutritionalValues.sodium;
+        }
+      }
+      return NutritionalValues.values(
+          energy, protein, carbohydrates, carbohydratesSugar, fat, fatSaturated, fibres, sodium);
+    }
+    return nutritionalValues;
+  }
+
   Map<DateTime, NutritionalValues> get logEntriesValues {
     final out = <DateTime, NutritionalValues>{};
     for (final log in logs) {

@@ -85,7 +85,7 @@ class WeightForm extends StatelessWidget {
           TextFormField(
             decoration: InputDecoration(labelText: AppLocalizations.of(context).weight),
             controller: weightController,
-            keyboardType: TextInputType.number,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
             onSaved: (newValue) {
               _weightEntry.weight = double.parse(newValue!);
             },
@@ -94,6 +94,7 @@ class WeightForm extends StatelessWidget {
                 return AppLocalizations.of(context).enterValue;
               }
               try {
+                value = value.replaceAll(',', '.');
                 double.parse(value);
               } catch (error) {
                 return AppLocalizations.of(context).enterValidNumber;

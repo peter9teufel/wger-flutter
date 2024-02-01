@@ -237,7 +237,7 @@ class IngredientLogForm extends StatelessWidget {
 
   IngredientLogForm(this._plan) {
     _mealItem = MealItem.empty();
-    _dateController.text = toDate(DateTime.now())!;
+    _dateController.text = toDate(DateTime.now(), includeTime: true)!;
   }
 
   @override
@@ -291,7 +291,7 @@ class IngredientLogForm extends StatelessWidget {
                 );
 
                 if (pickedDate != null) {
-                  _dateController.text = toDate(pickedDate)!;
+                  _dateController.text = toDate(pickedDate, includeTime: true)!;
                 }
               },
               onSaved: (newValue) {

@@ -215,12 +215,13 @@ class MeasurementEntryForm extends StatelessWidget {
               suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
             ),
             controller: _valueController,
-            keyboardType: TextInputType.number,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
               if (value!.isEmpty) {
                 return AppLocalizations.of(context).enterValue;
               }
               try {
+                value = value.replaceAll(',', '.');
                 double.parse(value);
               } catch (error) {
                 return AppLocalizations.of(context).enterValidNumber;

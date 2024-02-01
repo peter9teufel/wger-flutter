@@ -292,6 +292,15 @@ class ExercisesProvider with ChangeNotifier {
   ///    -> yes: fetch data and update if necessary
   Future<Exercise> handleUpdateExerciseFromApi(ExerciseDatabase database, int exerciseId) async {
     Exercise exercise;
+    final int exerciseDbCount =
+        (await (database.select(database.exercises)..where((e) => e.id.equals(exerciseId))).get())
+            .length;
+    if (exerciseDbCount > 1) {
+      log('Exercise $exerciseId has $exerciseDbCount entries in the database. This should not happen, cleaning up...');
+      database.delete(database.exercises)
+        ..where((e) => e.id.equals(exerciseId))
+        ..go();
+    }
     final exerciseDb = await (database.select(database.exercises)
           ..where((e) => e.id.equals(exerciseId)))
         .getSingleOrNull();

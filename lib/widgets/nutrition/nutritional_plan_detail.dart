@@ -40,7 +40,7 @@ class NutritionalPlanDetailWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nutritionalValues = _nutritionalPlan.nutritionalValues;
+    final nutritionalValues = _nutritionalPlan.getNutritionalValuesForMealsOrLogs();
     final valuesPercentage = _nutritionalPlan.energyPercentage(nutritionalValues);
     final lastWeightEntry = Provider.of<BodyWeightProvider>(context, listen: false).getLastEntry();
     final valuesGperKg = lastWeightEntry != null

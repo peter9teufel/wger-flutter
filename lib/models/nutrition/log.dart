@@ -26,6 +26,7 @@ import 'package:wger/models/nutrition/nutritional_values.dart';
 part 'log.g.dart';
 
 @JsonSerializable()
+@CustomDateTimeConverter()
 class Log {
   @JsonKey(required: true)
   int? id;
@@ -73,6 +74,10 @@ class Log {
     weightUnitId = mealItem.weightUnitId;
     datetime = dateTime ?? DateTime.now();
     amount = mealItem.amount;
+  }
+
+  Object? _parseDateTime(Map<dynamic, dynamic> json, key) {
+    return DateTime.parse(json['datetime']).toLocal();
   }
 
   // Boilerplate

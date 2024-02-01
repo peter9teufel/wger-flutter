@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 num stringToNum(String? e) {
   return e == null ? 0 : num.parse(e);
@@ -35,9 +36,12 @@ String? numToString(num? e) {
  * Converts a datetime to ISO8601 date format, but only the date.
  * Needed e.g. when the wger api only expects a date and no time information.
  */
-String? toDate(DateTime? dateTime) {
+String? toDate(DateTime? dateTime, {bool includeTime = false}) {
   if (dateTime == null) {
     return null;
+  }
+  if (includeTime) {
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
   }
   return DateFormat('yyyy-MM-dd').format(dateTime);
 }
@@ -61,4 +65,16 @@ String? timeToString(TimeOfDay? time) {
     return null;
   }
   return const DefaultMaterialLocalizations().formatTimeOfDay(time, alwaysUse24HourFormat: true);
+}
+
+class CustomDateTimeConverter implements JsonConverter<DateTime, String> {
+  const CustomDateTimeConverter();
+
+  @override
+  DateTime fromJson(String json) {
+    return DateTime.parse(json).toLocal();
+  }
+
+  @override
+  String toJson(DateTime json) => json.toIso8601String();
 }

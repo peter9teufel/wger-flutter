@@ -22,6 +22,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:wger/models/nutrition/log.dart';
 import 'package:wger/models/nutrition/nutritional_plan.dart';
 import 'package:wger/models/workouts/workout_plan.dart';
 import 'package:wger/providers/body_weight.dart';
@@ -69,79 +70,138 @@ class _DashboardNutritionWidgetState extends State<DashboardNutritionWidget> {
       return out;
     }
 
-    for (final meal in _plan!.meals) {
-      out.add(
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                meal.time!.format(context),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-                //textAlign: TextAlign.left,
+    final List<Log> logsForToday = _plan!.logsForToday();
+    if (_plan!.meals.isEmpty && logsForToday.isEmpty) {
+      out.add(const Row(
+        children: [Text('Noch keine Einträge für heute')],
+      ));
+      return out;
+    } else {
+      if (_plan!.meals.isEmpty) {
+        // show logs summary
+        double fat = 0;
+        double energy = 0;
+        double protein = 0;
+        double carbohydrates = 0;
+        String? date;
+        for (final log in _plan!.logs) {
+          if (log.datetime.day == DateTime.now().day &&
+              log.datetime.month == DateTime.now().month &&
+              log.datetime.year == DateTime.now().year) {
+            date ??=
+                DateFormat.yMd(Localizations.localeOf(context).languageCode).format(log.datetime);
+            fat += log.nutritionalValues.fat;
+            energy += log.nutritionalValues.energy;
+            protein += log.nutritionalValues.protein;
+            carbohydrates += log.nutritionalValues.carbohydrates;
+          }
+        }
+        out.add(
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  date!,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  //textAlign: TextAlign.left,
+                ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                MutedText(
-                    '${AppLocalizations.of(context).energyShort} ${meal.nutritionalValues.energy.toStringAsFixed(0)}${AppLocalizations.of(context).kcal}'),
-                const MutedText(' / '),
-                MutedText(
-                    '${AppLocalizations.of(context).proteinShort} ${meal.nutritionalValues.protein.toStringAsFixed(0)}${AppLocalizations.of(context).g}'),
-                const MutedText(' / '),
-                MutedText(
-                    '${AppLocalizations.of(context).carbohydratesShort} ${meal.nutritionalValues.carbohydrates.toStringAsFixed(0)}${AppLocalizations.of(context).g}'),
-                const MutedText(' / '),
-                MutedText(
-                    '${AppLocalizations.of(context).fatShort} ${meal.nutritionalValues.fat.toStringAsFixed(0)}${AppLocalizations.of(context).g} '),
-              ],
-            ),
-            IconButton(
-              icon: const Icon(Icons.history_edu),
-              color: wgerPrimaryButtonColor,
-              onPressed: () {
-                Provider.of<NutritionPlansProvider>(context, listen: false).logMealToDiary(meal);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context).mealLogged,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      );
-      out.add(const SizedBox(height: 5));
+            ],
+          ),
+        );
+        out.add(Row(children: [
+          MutedText(
+              '${AppLocalizations.of(context).energy}: ${energy.toStringAsFixed(0)}${AppLocalizations.of(context).kcal}'),
+        ]));
+        out.add(Row(children: [
+          MutedText(
+              '${AppLocalizations.of(context).protein}: ${protein.toStringAsFixed(0)}${AppLocalizations.of(context).g}'),
+        ]));
+        out.add(Row(children: [
+          MutedText(
+              '${AppLocalizations.of(context).carbohydrates}: ${carbohydrates.toStringAsFixed(0)}${AppLocalizations.of(context).g}'),
+        ]));
+        out.add(Row(children: [
+          MutedText(
+              '${AppLocalizations.of(context).fat}: ${fat.toStringAsFixed(0)}${AppLocalizations.of(context).g} '),
+        ]));
+        out.add(const SizedBox(height: 5));
+      }
 
-      if (_showDetail) {
-        for (final item in meal.mealItems) {
-          out.add(
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        item.ingredientObj.name,
-                        overflow: TextOverflow.ellipsis,
+      for (final meal in _plan!.meals) {
+        out.add(
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  meal.time!.format(context),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  //textAlign: TextAlign.left,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  MutedText(
+                      '${AppLocalizations.of(context).energyShort} ${meal.nutritionalValues.energy.toStringAsFixed(0)}${AppLocalizations.of(context).kcal}'),
+                  const MutedText(' / '),
+                  MutedText(
+                      '${AppLocalizations.of(context).proteinShort} ${meal.nutritionalValues.protein.toStringAsFixed(0)}${AppLocalizations.of(context).g}'),
+                  const MutedText(' / '),
+                  MutedText(
+                      '${AppLocalizations.of(context).carbohydratesShort} ${meal.nutritionalValues.carbohydrates.toStringAsFixed(0)}${AppLocalizations.of(context).g}'),
+                  const MutedText(' / '),
+                  MutedText(
+                      '${AppLocalizations.of(context).fatShort} ${meal.nutritionalValues.fat.toStringAsFixed(0)}${AppLocalizations.of(context).g} '),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.history_edu),
+                color: wgerPrimaryButtonColor,
+                onPressed: () {
+                  Provider.of<NutritionPlansProvider>(context, listen: false).logMealToDiary(meal);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context).mealLogged,
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(width: 5),
-                    Text('${item.amount.toStringAsFixed(0)} ${AppLocalizations.of(context).g}'),
-                  ],
-                ),
-              ],
-            ),
-          );
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        out.add(const SizedBox(height: 5));
+
+        if (_showDetail) {
+          for (final item in meal.mealItems) {
+            out.add(
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          item.ingredientObj.name,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text('${item.amount.toStringAsFixed(0)} ${AppLocalizations.of(context).g}'),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }
+          out.add(const SizedBox(height: 10));
         }
-        out.add(const SizedBox(height: 10));
+        out.add(const Divider());
       }
-      out.add(const Divider());
     }
 
     return out;
@@ -159,8 +219,7 @@ class _DashboardNutritionWidgetState extends State<DashboardNutritionWidget> {
             ),
             subtitle: Text(
               _hasContent
-                  ? DateFormat.yMd(Localizations.localeOf(context).languageCode)
-                      .format(_plan!.creationDate)
+                  ? 'Erstellt: ${DateFormat.yMd(Localizations.localeOf(context).languageCode).format(_plan!.creationDate)}'
                   : '',
             ),
             leading: Icon(
@@ -191,7 +250,8 @@ class _DashboardNutritionWidgetState extends State<DashboardNutritionWidget> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
                       height: 180,
-                      child: FlNutritionalPlanPieChartWidget(_plan!.nutritionalValues),
+                      child: FlNutritionalPlanPieChartWidget(
+                          _plan!.getNutritionalValuesForMealsOrLogs()),
                     )
                   ],
                 ))
