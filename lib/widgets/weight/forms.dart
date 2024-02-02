@@ -87,7 +87,7 @@ class WeightForm extends StatelessWidget {
             controller: weightController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             onSaved: (newValue) {
-              _weightEntry.weight = double.parse(newValue!);
+              _weightEntry.weight = double.parse(newValue!.replaceAll(',', '.'));
             },
             validator: (value) {
               if (value!.isEmpty) {

@@ -229,7 +229,7 @@ class MeasurementEntryForm extends StatelessWidget {
               return null;
             },
             onSaved: (newValue) {
-              _entryData['value'] = double.parse(newValue!);
+              _entryData['value'] = double.parse(newValue!.replaceAll(',', '.'));
             },
           ),
           // Value
