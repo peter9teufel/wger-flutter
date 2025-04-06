@@ -20,7 +20,7 @@ platform :ios do
     apikey
     build_app(workspace: "Runner.xcworkspace", scheme: "Runner")
     upload_to_app_store(
-      precheck_include_in_app_purchases: false
+      run_precheck_before_submit: false
     )
   end
 
