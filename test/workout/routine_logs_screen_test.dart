@@ -21,8 +21,8 @@ import 'dart:io';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:wger/l10n/generated/app_localizations.dart';
 import 'package:wger/models/workouts/routine.dart';
@@ -41,7 +41,9 @@ void main() {
 
   setUp(() {
     routine = getTestRoutine();
-    routine.logs[0].date = DateTime.now();
+    routine.sessions[0].session.date = DateTime(2025, 3, 29);
+
+    when(mockRoutinesProvider.findById(any)).thenAnswer((_) => routine);
   });
 
   Widget renderWidget({locale = 'en'}) {
@@ -57,7 +59,7 @@ void main() {
         home: TextButton(
           onPressed: () => key.currentState!.push(
             MaterialPageRoute<void>(
-              settings: RouteSettings(arguments: routine),
+              settings: RouteSettings(arguments: routine.id),
               builder: (_) => const WorkoutLogsScreen(),
             ),
           ),
@@ -70,17 +72,49 @@ void main() {
     );
   }
 
-  testGoldens('Smoke test the widgets on the routine logs screen', (WidgetTester tester) async {
+  testWidgets(
+    'Smoke test the widgets on the routine logs screen',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(500, 1000);
+      tester.view.devicePixelRatio = 1.0; // Ensure correct pixel ratio
+
+      await withClock(Clock.fixed(DateTime(2025, 3, 29)), () async {
+        await tester.pumpWidget(renderWidget());
+        await tester.tap(find.byType(TextButton));
+        await tester.pumpAndSettle();
+
+        if (Platform.isLinux) {
+          await expectLater(
+            find.byType(WorkoutLogsScreen),
+            matchesGoldenFile('goldens/routine_logs_screen_detail.png'),
+          );
+        }
+
+        expect(find.text('Training logs'), findsOneWidget);
+        expect(find.byType(WorkoutLogCalendar), findsOneWidget);
+        expect(find.text('Bench press'), findsOneWidget);
+        expect(find.byKey(const ValueKey('delete-log-1')), findsOneWidget);
+        expect(find.byKey(const ValueKey('delete-log-2')), findsOneWidget);
+        expect(find.byKey(const ValueKey('delete-log-3')), findsNothing);
+      });
+    },
+    tags: ['golden'],
+  );
+
+  testWidgets('Test deleting log entries', (WidgetTester tester) async {
     await withClock(Clock.fixed(DateTime(2025, 3, 29)), () async {
-      await loadAppFonts();
       await tester.pumpWidget(renderWidget());
       await tester.tap(find.byType(TextButton));
       await tester.pumpAndSettle();
+      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('delete-log-1')));
+      await tester.pumpAndSettle();
 
-      await screenMatchesGolden(tester, 'routine_logs_screen_detail', skip: !Platform.isLinux);
-
-      expect(find.text('Training logs'), findsOneWidget);
-      expect(find.byType(WorkoutLogCalendar), findsOneWidget);
+      expect(find.byKey(const ValueKey('delete-button')), findsOneWidget);
+      expect(find.byKey(const ValueKey('cancel-button')), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('delete-button')));
+      verify(mockRoutinesProvider.deleteLog(1, 1)).called(1);
     });
   });
 }
