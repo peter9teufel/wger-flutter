@@ -67,10 +67,6 @@
   },
   "loginInstead": "Вже маєте обліковий запис? Увійти",
   "@loginInstead": {},
-  "labelWorkoutPlans": "Плани тренувань",
-  "@labelWorkoutPlans": {
-    "description": "Title for screen workout plans"
-  },
   "labelBottomNavWorkout": "Тренування",
   "@labelBottomNavWorkout": {
     "description": "Label used in bottom navigation, use a short word"
@@ -114,10 +110,6 @@
   "category": "Категорія",
   "@category": {
     "description": "Category for an exercise, ingredient, etc."
-  },
-  "newWorkout": "Новий план тренувань",
-  "@newWorkout": {
-    "description": "Header when adding a new workout"
   },
   "repetitions": "Повторень",
   "@repetitions": {
@@ -209,10 +201,6 @@
   },
   "weightUnit": "Одиниця ваги",
   "@weightUnit": {},
-  "noWorkoutPlans": "У вас немає планів тренувань",
-  "@noWorkoutPlans": {
-    "description": "Message shown when the user has no workout plans"
-  },
   "dayDescriptionHelp": "Опис того, що робиться в цей день (наприклад, «день підтягування») або які частини тіла тренуються (наприклад, «груди та плечі»)",
   "@dayDescriptionHelp": {},
   "workoutSession": "Сеанс тренування",
@@ -258,10 +246,6 @@
   "aboutDescription": "Дякуємо за використання wger! wger - це спільний проєкт з відкритим кодом, створений ентузіастами фітнесу з усього світу.",
   "@aboutDescription": {
     "description": "Text in the about dialog"
-  },
-  "aboutBugsText": "Зв'яжіться з нами, якщо щось відбувається не так, як очікувалося, або якщо є функція, яка, на вашу думку, відсутня.",
-  "@aboutBugsText": {
-    "description": "Text for bugs section in the about dialog"
   },
   "selectExercise": "Будь ласка, виберіть вправу",
   "@selectExercise": {
@@ -441,34 +425,6 @@
   },
   "goToDetailPage": "Перейти до сторінки відомостей",
   "@goToDetailPage": {},
-  "aboutSourceTitle": "Джерельний код",
-  "@aboutSourceTitle": {
-    "description": "Title for source code section in the about dialog"
-  },
-  "aboutSourceText": "Отримайте джерельний код цього застосунку та його сервера на github",
-  "@aboutSourceText": {
-    "description": "Text for source code section in the about dialog"
-  },
-  "aboutBugsTitle": "У вас є проблема чи ідея?",
-  "@aboutBugsTitle": {
-    "description": "Title for bugs section in the about dialog"
-  },
-  "aboutContactUsTitle": "Привітайтеся!",
-  "@aboutContactUsTitle": {
-    "description": "Title for contact us section in the about dialog"
-  },
-  "aboutContactUsText": "Якщо ви хочете поспілкуватися з нами, зайдіть на сервер Discord і зв'яжіться з нами",
-  "@aboutContactUsText": {
-    "description": "Text for contact us section in the about dialog"
-  },
-  "aboutTranslationTitle": "Перекладання",
-  "@aboutTranslationTitle": {
-    "description": "Title for translation section in the about dialog"
-  },
-  "aboutTranslationText": "Цей заатосунок перекладено на Weblate. Якщо ви також хочете допомогти, клацніть на посилання та почніть переклад",
-  "@aboutTranslationText": {
-    "description": "Text for translation section in the about dialog"
-  },
   "goToToday": "Перейти до сьогодні",
   "@goToToday": {
     "description": "Label on button to jump back to 'today' in the calendar widget"
@@ -565,7 +521,7 @@
   },
   "miles": "Милі",
   "@miles": {},
-  "aboutPageTitle": "Про Wger",
+  "aboutPageTitle": "Про нас та підтримка",
   "@aboutPageTitle": {},
   "noMeasurementEntries": "У вас немає записів вимірювання",
   "@noMeasurementEntries": {},
@@ -742,7 +698,7 @@
   "@kg": {
     "description": "Generated entry for translation for server strings"
   },
-  "kilometers_per_hour": "Кілометрів на годину",
+  "kilometers_per_hour": "Кілометри на годину",
   "@kilometers_per_hour": {
     "description": "Generated entry for translation for server strings"
   },
@@ -889,17 +845,13 @@
   "@today": {},
   "loggedToday": "Зареєстровано сьогодні",
   "@loggedToday": {},
-  "aboutDonateTitle": "Пожертвуйте",
+  "aboutDonateTitle": "Зробіть пожертву",
   "@aboutDonateTitle": {},
-  "aboutDonateText": "Купіть нам каву, щоб допомогти проекту, оплатити витрати на сервер і підтримати нас",
+  "aboutDonateText": "Хоча проект є безкоштовним і завжди ним залишатиметься, запуск сервера - ні! Розвиток також вимагає значного часу і зусиль від волонтерів. Ваш внесок безпосередньо підтримує ці витрати, допомагаючи підтримувати надійність сервісу.",
   "@aboutDonateText": {},
   "surplus": "надлишок",
   "@surplus": {
     "description": "Caloric surplus (either planned or unplanned)"
-  },
-  "aboutMastodonText": "Слідкуйте за оновленнями та новинами про проект на Mastodon",
-  "@aboutMastodonText": {
-    "description": "Text for the mastodon section in the about dialog"
   },
   "done": "Готово",
   "@done": {},
@@ -914,9 +866,7 @@
   "selectMealToLog": "Виберіть страву, щоб записати в щоденник",
   "@selectMealToLog": {},
   "aboutMastodonTitle": "Мастодонт",
-  "@aboutMastodonTitle": {
-    "description": "Title for mastodon section in the about dialog"
-  },
+  "@aboutMastodonTitle": {},
   "settingsCacheTitle": "Кеш",
   "@settingsCacheTitle": {},
   "settingsCacheDeletedSnackbar": "Кеш успішно очищено",
@@ -996,5 +946,67 @@
   "setHasProgressionWarning": "Зверніть увагу, що на даний момент неможливо змінити всі параметри набору в мобільному додатку або налаштувати автоматичний прогрес. Наразі використовуйте веб-додаток.",
   "@setHasProgressionWarning": {},
   "setHasNoExercises": "У цьому комплексі ще немає вправ!",
-  "@setHasNoExercises": {}
+  "@setHasNoExercises": {},
+  "errorCouldNotConnectToServerDetails": "Програмі не вдалося підключитися до сервера. Перевірте підключення до Інтернету або URL-адресу сервера та спробуйте ще раз. Якщо проблема не зникає, зверніться до адміністратора сервера.",
+  "@errorCouldNotConnectToServerDetails": {},
+  "errorViewDetails": "Технічні деталі",
+  "@errorViewDetails": {},
+  "errorCouldNotConnectToServer": "Не вдалося підключитися до сервера",
+  "@errorCouldNotConnectToServer": {},
+  "errorInfoDescription2": "Ви можете продовжувати користуватися додатком, але деякі функції можуть не працювати.",
+  "@errorInfoDescription2": {},
+  "errorInfoDescription": "Вибачте, але щось пішло не так. Ви можете допомогти нам виправити це, повідомивши про проблему на GitHub.",
+  "@errorInfoDescription": {},
+  "copyToClipboard": "Копіювати в буфер обміну",
+  "@copyToClipboard": {},
+  "aboutWhySupportTitle": "Відкритий код та безкоштовний у використанні ❤️",
+  "@aboutWhySupportTitle": {},
+  "aboutJoinCommunityTitle": "Приєднуйтесь до спільноти",
+  "@aboutJoinCommunityTitle": {},
+  "aboutDiscordTitle": "Дискорд",
+  "@aboutDiscordTitle": {},
+  "aboutBugsListTitle": "Повідомити про проблему або запропонувати функцію",
+  "@aboutBugsListTitle": {},
+  "aboutSourceListTitle": "Переглянути вихідний код",
+  "@aboutSourceListTitle": {},
+  "aboutContributeTitle": "Зробити внесок",
+  "@aboutContributeTitle": {},
+  "aboutContributeText": "Ми вітаємо будь-які види внесків. Незалежно від того, чи ви розробник, перекладач, чи просто захоплений фітнесом, ми цінуємо будь-яку підтримку!",
+  "@aboutContributeText": {},
+  "aboutTranslationListTitle": "Перекласти програму",
+  "@aboutTranslationListTitle": {},
+  "others": "Інші",
+  "@others": {},
+  "apiToken": "Токен API",
+  "@apiToken": {},
+  "useApiToken": "Використовувати токен API",
+  "@useApiToken": {},
+  "useUsernameAndPassword": "Використовуйте ім'я користувача та пароль",
+  "@useUsernameAndPassword": {},
+  "invalidApiToken": "Будь ласка, введіть дійсний ключ API",
+  "@invalidApiToken": {
+    "description": "Error message when the user enters an invalid API key"
+  },
+  "apiTokenValidChars": "Ключ API може містити лише літери a-f, цифри 0-9 та мати довжину рівно 40 символів",
+  "@apiTokenValidChars": {
+    "description": "Error message when the user tries to input a API key with forbidden characters"
+  },
+  "resistance_band": "Еспандер",
+  "@resistance_band": {
+    "description": "Generated entry for translation for server strings"
+  },
+  "selectAvailablePlates": "Виберіть доступні тарілки",
+  "@selectAvailablePlates": {},
+  "barWeight": "Вага штанги",
+  "@barWeight": {},
+  "useColors": "Використовуйте кольори",
+  "@useColors": {},
+  "yourCurrentNutritionPlanHasNoMealsDefinedYet": "У вашому поточному плані харчування не визначено жодного прийому їжі",
+  "@yourCurrentNutritionPlanHasNoMealsDefinedYet": {
+    "description": "Message shown when a nutrition plan doesn't have any meals"
+  },
+  "toAddMealsToThePlanGoToNutritionalPlanDetails": "Щоб додати страви до плану, перейдіть до деталей плану харчування",
+  "@toAddMealsToThePlanGoToNutritionalPlanDetails": {
+    "description": "Message shown to guide users to the nutritional plan details page to add meals"
+  }
 }

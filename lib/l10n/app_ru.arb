@@ -5,10 +5,6 @@
   },
   "email": "Адрес электронной почты",
   "@email": {},
-  "labelWorkoutPlans": "Планы тренировок",
-  "@labelWorkoutPlans": {
-    "description": "Title for screen workout plans"
-  },
   "registerInstead": "У вас нет аккаунта? Зарегистрируйтесь сейчас",
   "@registerInstead": {},
   "loginInstead": "Уже есть аккаунт? Войти",
@@ -37,15 +33,15 @@
   "@notes": {
     "description": "Personal notes, e.g. for a workout session"
   },
-  "workoutSession": "Тренировка",
+  "workoutSession": "Записанная тренировка",
   "@workoutSession": {
     "description": "A (logged) workout session"
   },
   "newDay": "Новый день",
   "@newDay": {},
-  "selectExercises": "Если вы хотите сделать суперсет, вы можете найти несколько упражнений, они будут сгруппированы вместе",
+  "selectExercises": "Если вы хотите сделать супер подход (сет), вы можете найти несколько упражнений, они будут сгруппированы вместе",
   "@selectExercises": {},
-  "plateCalculator": "Пластины",
+  "plateCalculator": "Пластины (блины)",
   "@plateCalculator": {
     "description": "Label used for the plate calculator in the gym mode"
   },
@@ -101,18 +97,6 @@
   },
   "goToDetailPage": "Перейти на страницу сведений",
   "@goToDetailPage": {},
-  "aboutSourceTitle": "Исходный код",
-  "@aboutSourceTitle": {
-    "description": "Title for source code section in the about dialog"
-  },
-  "aboutContactUsTitle": "Скажите привет!",
-  "@aboutContactUsTitle": {
-    "description": "Title for contact us section in the about dialog"
-  },
-  "aboutTranslationTitle": "Перевод",
-  "@aboutTranslationTitle": {
-    "description": "Title for translation section in the about dialog"
-  },
   "calendar": "Календарь",
   "@calendar": {},
   "enterValue": "Пожалуйста, введите значение",
@@ -175,10 +159,6 @@
   "category": "Категория",
   "@category": {
     "description": "Category for an exercise, ingredient, etc."
-  },
-  "noWorkoutPlans": "У вас нет планов тренировок",
-  "@noWorkoutPlans": {
-    "description": "Message shown when the user has no workout plans"
   },
   "login": "Войти",
   "@login": {
@@ -274,10 +254,6 @@
   "@musclesSecondary": {
     "description": "secondary muscles trained by an exercise"
   },
-  "newWorkout": "Новый план тренировок",
-  "@newWorkout": {
-    "description": "Header when adding a new workout"
-  },
   "dayDescriptionHelp": "Описание того, что делается в этот день (например, 'день подтягиваний') или какие части тела тренируются (например, 'грудь и плечи')",
   "@dayDescriptionHelp": {},
   "weightUnit": "Единица веса",
@@ -296,7 +272,7 @@
   "@impression": {
     "description": "General impression (e.g. for a workout session) such as good, bad, etc."
   },
-  "set": "Сет",
+  "set": "Подход",
   "@set": {
     "description": "A set in a workout plan"
   },
@@ -308,17 +284,17 @@
   "@jumpTo": {
     "description": "Imperative. Label used in popup allowing the user to jump to a specific exercise while in the gym mode"
   },
-  "logHelpEntriesUnits": "Обратите внимание, что в таблицу заносятся только записи с единицей веса (кг или фунты) и повторениями, другие комбинации, такие как время или до отказа, здесь не учитываются.",
+  "logHelpEntriesUnits": "Обратите внимание, что на графиках отображаются только записи с указанием веса (кг или фунты) и повторений. Другие комбинации, такие как время или \"до отказа\", здесь игнорируются.",
   "@logHelpEntriesUnits": {},
   "pause": "Пауза",
   "@pause": {
     "description": "Noun, not an imperative! Label used for the pause when using the gym mode"
   },
-  "plateCalculatorNotDivisible": "Невозможно достичь веса с имеющимися пластинами",
+  "plateCalculatorNotDivisible": "Невозможно достичь веса с имеющимися пластинами (весами)",
   "@plateCalculatorNotDivisible": {
     "description": "Error message when the current weight is not reachable with plates (e.g. 33.1 kg)"
   },
-  "todaysWorkout": "Ваша тренировка сегодня",
+  "todaysWorkout": "Ваша сегодняшняя тренировка",
   "@todaysWorkout": {},
   "logHelpEntries": "Если в один день есть несколько записей с одинаковым количеством повторений, но разными весами, то на диаграмме отображается только запись с большим весом.",
   "@logHelpEntries": {},
@@ -338,7 +314,7 @@
   "@nutritionalPlans": {},
   "timeStartAhead": "Время начала не может быть раньше времени окончания",
   "@timeStartAhead": {},
-  "logIngredient": "Сохранить в дневнике питания",
+  "logIngredient": "Записать в дневнике питания",
   "@logIngredient": {},
   "searchIngredient": "Поиск ингредиента",
   "@searchIngredient": {
@@ -360,7 +336,7 @@
   "@date": {
     "description": "The date of a workout log or body weight entry"
   },
-  "start": "Начать",
+  "start": "Старт",
   "@start": {
     "description": "Label on button to start the gym mode (i.e., an imperative)"
   },
@@ -455,29 +431,9 @@
   "@aboutDescription": {
     "description": "Text in the about dialog"
   },
-  "aboutContactUsText": "Если вы хотите пообщаться с нами, зайдите на сервер Discord и свяжитесь с нами",
-  "@aboutContactUsText": {
-    "description": "Text for contact us section in the about dialog"
-  },
-  "aboutTranslationText": "Это приложение переведено на weblate. Если вы тоже хотите помочь, нажмите на ссылку и начните переводить",
-  "@aboutTranslationText": {
-    "description": "Text for translation section in the about dialog"
-  },
-  "aboutSourceText": "Получите исходный код этого приложения и его сервера на github",
-  "@aboutSourceText": {
-    "description": "Text for source code section in the about dialog"
-  },
-  "aboutBugsTitle": "Есть проблема или идея?",
-  "@aboutBugsTitle": {
-    "description": "Title for bugs section in the about dialog"
-  },
   "enterValidNumber": "Пожалуйста, введите правильное число",
   "@enterValidNumber": {
     "description": "Error message when the user has submitted an invalid number (e.g. '3,.,.,.')"
-  },
-  "aboutBugsText": "Свяжитесь с нами, если что-то пошло не так или если вам кажется, что какой-то функции не хватает.",
-  "@aboutBugsText": {
-    "description": "Text for bugs section in the about dialog"
   },
   "goToToday": "Перейти на сегодня",
   "@goToToday": {
@@ -487,9 +443,9 @@
   "@optionsLabel": {
     "description": "Label for the popup with general app options"
   },
-  "sameRepetitions": "Если вы делаете одинаковые повторения и вес для всех сетов, вы можете просто заполнить одну строку. Например, для 4 сетов просто введите 10 повторений, это автоматически превратится в \"4 x 10\".",
+  "sameRepetitions": "Если количество повторений и вес не меняются от подхода к подходу, достаточно указать данные один раз. Например, для 4 подходов введите 10 повторений, и это автоматически преобразуется в '4 x 10'.",
   "@sameRepetitions": {},
-  "newSet": "Новый сет",
+  "newSet": "Новый подход (сет)",
   "@newSet": {
     "description": "Header when adding a new set to a workout day"
   },
@@ -826,10 +782,6 @@
       }
     }
   },
-  "aboutMastodonText": "Подписывайтесь на нас в Mastodon, чтобы получать обновления и новости о проекте",
-  "@aboutMastodonText": {
-    "description": "Text for the mastodon section in the about dialog"
-  },
   "useMetric": "Использовать метрические единицы измерения для веса тела.",
   "@useMetric": {},
   "verify": "Подтвердить",
@@ -897,9 +849,7 @@
     "description": "Generated entry for translation for server strings"
   },
   "aboutMastodonTitle": "Мастодонт",
-  "@aboutMastodonTitle": {
-    "description": "Title for mastodon section in the about dialog"
-  },
+  "@aboutMastodonTitle": {},
   "surplus": "превышение",
   "@surplus": {
     "description": "Caloric surplus (either planned or unplanned)"
@@ -984,5 +934,65 @@
     }
   },
   "settingsIngredientCacheDescription": "Кэш ингредиентов",
-  "@settingsIngredientCacheDescription": {}
+  "@settingsIngredientCacheDescription": {},
+  "isRestDayHelp": "Пожалуйста, имейте в виду, что если вы отметите этот день как день отдыха, все подходы и упражнения будут удалены.",
+  "@isRestDayHelp": {},
+  "routines": "Тренировки",
+  "@routines": {},
+  "needsLogsToAdvanceHelp": "Выберите, если вы хотите, чтобы программа переходила к следующему запланированному дню только после того, как вы записали тренировку за текущий день.",
+  "@needsLogsToAdvanceHelp": {},
+  "routineDays": "Дней в тренировке",
+  "@routineDays": {},
+  "resultingRoutine": "Итоговая тренировка",
+  "@resultingRoutine": {},
+  "useApiToken": "Использовать токен API",
+  "@useApiToken": {},
+  "useUsernameAndPassword": "Использовать имя пользователя и пароль",
+  "@useUsernameAndPassword": {},
+  "apiToken": "API токен",
+  "@apiToken": {},
+  "invalidApiToken": "Пожалуйста, введите действительный ключ API",
+  "@invalidApiToken": {
+    "description": "Error message when the user enters an invalid API key"
+  },
+  "apiTokenValidChars": "API-ключ может содержать только буквы a–f, цифры 0–9 и иметь длину ровно 40 символов",
+  "@apiTokenValidChars": {
+    "description": "Error message when the user tries to input a API key with forbidden characters"
+  },
+  "newRoutine": "Новая тренировка",
+  "@newRoutine": {},
+  "noRoutines": "У вас нет тренировок",
+  "@noRoutines": {},
+  "restTime": "Время отдыха",
+  "@restTime": {},
+  "sets": "Подходы",
+  "@sets": {
+    "description": "The number of sets to be done for one exercise"
+  },
+  "exerciseNr": "Упражнение {nr}",
+  "@exerciseNr": {
+    "description": "Header in form indicating the number of the current exercise. Can also be translated as something like 'Set Nr. xy'.",
+    "type": "text",
+    "placeholders": {
+      "nr": {
+        "type": "String"
+      }
+    }
+  },
+  "supersetNr": "Супер подход",
+  "@supersetNr": {
+    "description": "Header in form indicating the number of the current exercise. Can also be translated as something like 'Superset Nr. xy'.",
+    "type": "text",
+    "placeholders": {
+      "nr": {
+        "type": "String"
+      }
+    }
+  },
+  "restDay": "День отдыха",
+  "@restDay": {},
+  "isRestDay": "Выходной день",
+  "@isRestDay": {},
+  "needsLogsToAdvance": "Требуются записи для прогресса",
+  "@needsLogsToAdvance": {}
 }
