@@ -32,7 +32,6 @@
 /build/
 **/failures/*.png
 
-
 # Symbolication related
 app.*.symbols
 
@@ -62,3 +61,6 @@ ios/fastlane/Preview.html
 ios/fastlane/output
 ios/Runner.ipa
 ios/Runner.app.dSYM.zip
+
+# FVM Version Cache
+.fvm/
