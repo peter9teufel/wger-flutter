@@ -18,9 +18,20 @@ platform :ios do
   desc "Push a new release build to AppStore Connect for manual submission to TestFlight beta testing or App Store Release."
   lane :release do
     apikey
-    build_app(workspace: "Runner.xcworkspace", scheme: "Runner")
+    gym(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      clean: true,
+      export_method: "app-store",
+      export_xcargs: "-allowProvisioningUpdates",
+      skip_profile_detection: true,
+      export_team_id: ENV["TEAM_ID"],
+      output_directory: "./build",
+      output_name: "Runner.ipa"
+    )
     upload_to_app_store(
-      precheck_include_in_app_purchases: false
+      ipa: "./build/Runner.ipa",
+      run_precheck_before_submit: false
     )
   end
 
