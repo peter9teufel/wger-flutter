@@ -18,6 +18,7 @@
 
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:wger/exceptions/http_exception.dart';
 import 'package:wger/helpers/consts.dart';
@@ -28,8 +29,9 @@ import 'package:wger/models/workouts/session.dart';
 import 'package:wger/providers/routines.dart';
 
 class SessionForm extends StatefulWidget {
+  final _logger = Logger('SessionForm');
   final WorkoutSession _session;
-  final int _routineId;
+  final int? _routineId;
   final Function()? _onSaved;
 
   static const SLIDER_START = -0.5;
@@ -42,8 +44,8 @@ class SessionForm extends StatefulWidget {
               dayId: dayId,
               impression: DEFAULT_IMPRESSION,
               date: clock.now(),
-              timeEnd: TimeOfDay.now(),
-              timeStart: TimeOfDay.now(),
+              timeEnd: TimeOfDay.fromDateTime(clock.now()),
+              timeStart: null,
             );
 
   @override
@@ -66,8 +68,10 @@ class _SessionFormState extends State<SessionForm> {
   void initState() {
     super.initState();
 
-    timeStartController.text = timeToString(widget._session.timeStart) ?? '';
-    timeEndController.text = timeToString(widget._session.timeEnd) ?? '';
+    timeStartController.text =
+        widget._session.timeStart == null ? '' : timeToString(widget._session.timeStart)!;
+    timeEndController.text =
+        widget._session.timeEnd == null ? '' : timeToString(widget._session.timeEnd)!;
     notesController.text = widget._session.notes;
 
     selectedImpression[widget._session.impression - 1] = true;
@@ -127,6 +131,7 @@ class _SessionFormState extends State<SessionForm> {
             },
           ),
           Row(
+            spacing: 10,
             children: [
               Flexible(
                 child: TextFormField(
@@ -161,16 +166,19 @@ class _SessionFormState extends State<SessionForm> {
                     if (timeStartController.text.isEmpty && timeEndController.text.isEmpty) {
                       return null;
                     }
-                    final TimeOfDay startTime = stringToTime(timeStartController.text);
-                    final TimeOfDay endTime = stringToTime(timeEndController.text);
-                    if (startTime.isAfter(endTime)) {
-                      return AppLocalizations.of(context).timeStartAhead;
+
+                    if (timeStartController.text.isNotEmpty && timeEndController.text.isNotEmpty) {
+                      final TimeOfDay startTime = stringToTime(timeStartController.text);
+                      final TimeOfDay endTime = stringToTime(timeEndController.text);
+                      if (startTime.isAfter(endTime)) {
+                        return AppLocalizations.of(context).timeStartAhead;
+                      }
                     }
+
                     return null;
                   },
                 ),
               ),
-              const SizedBox(width: 10),
               Flexible(
                 child: TextFormField(
                   key: const ValueKey('time-end'),
@@ -215,11 +223,18 @@ class _SessionFormState extends State<SessionForm> {
               }
               _form.currentState!.save();
 
+              // Reset any previous error message
+              setState(() {
+                errorMessage = const SizedBox.shrink();
+              });
+
               // Save the entry on the server
               try {
                 if (widget._session.id == null) {
+                  widget._logger.fine('Adding new session');
                   await routinesProvider.addSession(widget._session, widget._routineId);
                 } else {
+                  widget._logger.fine('Editing existing session with id ${widget._session.id}');
                   await routinesProvider.editSession(widget._session);
                 }
 
@@ -231,6 +246,7 @@ class _SessionFormState extends State<SessionForm> {
                   widget._onSaved!();
                 }
               } on WgerHttpException catch (error) {
+                widget._logger.warning('Could not save session: $error');
                 if (context.mounted) {
                   setState(() {
                     errorMessage = FormHttpErrorsWidget(error);

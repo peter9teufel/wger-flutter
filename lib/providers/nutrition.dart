@@ -18,6 +18,7 @@
 
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:wger/core/locator.dart';
@@ -66,13 +67,19 @@ class NutritionPlansProvider with ChangeNotifier {
     ingredients = [];
   }
 
-  /// Returns the current active nutritional plan. At the moment this is just
-  /// the latest, but this might change in the future.
+  /// Returns the current active nutritional plan.
+  /// A plan is considered active if:
+  /// - Its start date is before now
+  /// - Its end date is after now or not set
+  /// If multiple plans match these criteria, the one with the most recent creation date is returned.
   NutritionalPlan? get currentPlan {
-    if (_plans.isNotEmpty) {
-      return _plans.first;
-    }
-    return null;
+    final now = DateTime.now();
+    return _plans
+        .where((plan) =>
+            plan.startDate.isBefore(now) && (plan.endDate == null || plan.endDate!.isAfter(now)))
+        .toList()
+        .sorted((a, b) => b.creationDate.compareTo(a.creationDate))
+        .firstOrNull;
   }
 
   NutritionalPlan findById(int id) {
@@ -96,7 +103,7 @@ class NutritionPlansProvider with ChangeNotifier {
   /// object itself and no child attributes
   Future<void> fetchAndSetAllPlansSparse() async {
     final data = await baseProvider.fetchPaginated(
-      baseProvider.makeUrl(_nutritionalPlansPath, query: {'limit': '1000'}),
+      baseProvider.makeUrl(_nutritionalPlansPath, query: {'limit': API_MAX_PAGE_SIZE}),
     );
     _plans = [];
     for (final planData in data) {
@@ -109,7 +116,10 @@ class NutritionPlansProvider with ChangeNotifier {
 
   /// Fetches and sets all plans fully, i.e. with all corresponding child objects
   Future<void> fetchAndSetAllPlansFull() async {
-    final data = await baseProvider.fetchPaginated(baseProvider.makeUrl(_nutritionalPlansPath));
+    final data = await baseProvider.fetchPaginated(baseProvider.makeUrl(
+      _nutritionalPlansPath,
+      query: {'limit': API_MAX_PAGE_SIZE},
+    ));
     await Future.wait(data.map((e) => fetchAndSetPlanFull(e['id'])).toList());
   }
 
@@ -421,7 +431,7 @@ class NutritionPlansProvider with ChangeNotifier {
   ]) async {
     final plan = findById(planId);
     mealItem.ingredient = await fetchIngredient(mealItem.ingredientId);
-    final Log log = Log.fromMealItem(mealItem, plan.id!, null, dateTime);
+    final log = Log.fromMealItem(mealItem, plan.id!, null, dateTime);
 
     final data = await baseProvider.post(
       log.toJson(),
@@ -448,7 +458,7 @@ class NutritionPlansProvider with ChangeNotifier {
         _nutritionDiaryPath,
         query: {
           'plan': plan.id?.toString(),
-          'limit': '999',
+          'limit': API_MAX_PAGE_SIZE,
           'ordering': 'datetime',
         },
       ),

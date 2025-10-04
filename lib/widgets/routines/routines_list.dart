@@ -53,18 +53,18 @@ class _RoutinesListState extends State<RoutinesList> {
                 return Card(
                   child: ListTile(
                     onTap: () async {
-                      widget._routineProvider.activeRoutine = currentRoutine;
-
                       setState(() {
                         _loadingRoutine = currentRoutine.id;
                       });
-                      await widget._routineProvider.fetchAndSetRoutineFull(currentRoutine.id!);
+                      try {
+                        await widget._routineProvider.fetchAndSetRoutineFull(currentRoutine.id!);
+                      } finally {
+                        if (mounted) {
+                          setState(() => _loadingRoutine = null);
+                        }
+                      }
 
-                      if (mounted) {
-                        setState(() {
-                          _loadingRoutine = null;
-                        });
-
+                      if (context.mounted) {
                         Navigator.of(context).pushNamed(
                           RoutineScreen.routeName,
                           arguments: currentRoutine.id,

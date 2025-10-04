@@ -22,9 +22,10 @@ import '../test_data/nutritional_plans.dart';
 import '../test_data/profile.dart';
 import '../test_data/routines.dart';
 
-Widget createDashboardScreen({locale = 'en'}) {
+Widget createDashboardScreen({String locale = 'en'}) {
   final mockWorkoutProvider = MockRoutinesProvider();
-  when(mockWorkoutProvider.activeRoutine)
+  when(mockWorkoutProvider.items).thenReturn([getTestRoutine(exercises: getScreenshotExercises())]);
+  when(mockWorkoutProvider.currentRoutine)
       .thenReturn(getTestRoutine(exercises: getScreenshotExercises()));
 
   when(mockWorkoutProvider.fetchSessionData()).thenAnswer((a) => Future.value([

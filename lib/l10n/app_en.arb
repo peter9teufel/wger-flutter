@@ -155,6 +155,8 @@
   "@category": {
     "description": "Category for an exercise, ingredient, etc."
   },
+  "endDate": "End date",
+  "startDate": "Start date",
   "routines": "Routines",
   "newRoutine": "New routine",
   "noRoutines": "You have no routines",
@@ -328,6 +330,7 @@
   "errorInfoDescription": "We're sorry, but something went wrong. You can help us fix this by reporting the issue on GitHub.",
   "errorInfoDescription2": "You can continue using the app, but some features may not work.",
   "errorViewDetails": "Technical details",
+  "applicationLogs": "Application logs",
   "errorCouldNotConnectToServer": "Couldn't connect to server",
   "errorCouldNotConnectToServerDetails": "The application could not connect to the server. Please check your internet connection or the server URL and try again. If the problem persists, contact the server administrator.",
   "copyToClipboard": "Copy to clipboard",
@@ -383,6 +386,18 @@
   "date": "Date",
   "@date": {
     "description": "The date of a workout log or body weight entry"
+  },
+  "creationDate": "Start date",
+  "@creationDate": {
+    "description": "The Start date of a nutritional plan"
+  },
+  "endDate": "End date",
+  "@endDate": {
+    "description": "The End date of a nutritional plan"
+  },
+  "openEnded": "Open ended",
+  "@openEnded": {
+    "description": "When a nutrition plan has no pre-defined end date"
   },
   "value": "Value",
   "@value": {

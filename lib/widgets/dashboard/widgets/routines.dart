@@ -19,7 +19,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:wger/helpers/misc.dart';
+import 'package:wger/helpers/date.dart';
 import 'package:wger/l10n/generated/app_localizations.dart';
 import 'package:wger/models/workouts/day_data.dart';
 import 'package:wger/models/workouts/routine.dart';
@@ -44,7 +44,7 @@ class _DashboardRoutineWidgetState extends State<DashboardRoutineWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final routine = context.watch<RoutinesProvider>().activeRoutine;
+    final routine = context.watch<RoutinesProvider>().currentRoutine;
     _hasContent = routine != null;
     final dateFormat = DateFormat.yMd(Localizations.localeOf(context).languageCode);
 
