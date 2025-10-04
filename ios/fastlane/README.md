@@ -31,6 +31,14 @@ Set AppStore Connect API KEY using the provided environment variables.
 
 Push a new release build to AppStore Connect for manual submission to TestFlight beta testing or App Store Release.
 
+### ios release_from_archive
+
+```sh
+[bundle exec] fastlane ios release_from_archive
+```
+
+Export & upload from an existing .xcarchive (no rebuild)
+
 ### ios test_env
 
 ```sh

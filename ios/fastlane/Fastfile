@@ -37,6 +37,32 @@ platform :ios do
 
   ###############################################################################
 
+  desc "Export & upload from an existing .xcarchive (no rebuild)"
+  lane :release_from_archive do |options|
+    apikey
+
+    # Pfad zum entpackten Archive angeben (z. B. 'Runner.xcarchive')
+    archive_path = options[:archive_path] || "Runner.xcarchive"
+
+    build_ios_app(
+      archive_path: archive_path,
+      export_method: "app-store",
+      export_xcargs: "-allowProvisioningUpdates",
+      skip_profile_detection: true,
+      export_team_id: ENV["TEAM_ID"],
+      skip_build_archive: true,          # <- nutzt das vorhandene Archive
+      output_directory: "./build",
+      output_name: "Runner.ipa"
+    )
+
+    upload_to_app_store(
+      ipa: "./build/Runner.ipa",
+      run_precheck_before_submit: false
+    )
+  end
+
+  ###############################################################################
+
   desc "Test if all environment variables are present and check if API key is working properly."
   lane :test_env do
     UI.message "🔍 Testing environment variables..."
