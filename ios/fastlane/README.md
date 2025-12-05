@@ -39,6 +39,14 @@ Push a new release build to AppStore Connect for manual submission to TestFlight
 
 Export & upload from an existing .xcarchive (no rebuild)
 
+### ios upload_screenshots
+
+```sh
+[bundle exec] fastlane ios upload_screenshots
+```
+
+
+
 ### ios test_env
 
 ```sh

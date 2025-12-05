@@ -57,7 +57,26 @@ platform :ios do
 
     upload_to_app_store(
       ipa: "./build/Runner.ipa",
-      run_precheck_before_submit: false
+      run_precheck_before_submit: false,
+    )
+  end
+
+  ###############################################################################
+
+  lane :upload_screenshots do |options|
+    apikey
+
+    version = options[:version]
+    UI.user_error!("Please pass version:1.9.2") if version.to_s.empty?
+
+    deliver(
+      app_version: version,
+      run_precheck_before_submit: false,
+      screenshots_path: "fastlane/screenshots",
+      skip_binary_upload: true,
+      skip_metadata: true,
+      overwrite_screenshots: true,
+      force: true
     )
   end
 
