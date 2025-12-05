@@ -155,8 +155,26 @@
   "@category": {
     "description": "Category for an exercise, ingredient, etc."
   },
-  "endDate": "End date",
   "startDate": "Start date",
+  "@startDate": {
+    "description": "The start date of a nutritional plan or routine"
+  },
+  "dayTypeCustom": "Custom",
+  "dayTypeEnom": "Every minute on the minute",
+  "dayTypeAmrap": "As many rounds as possible",
+  "dayTypeHiit": "High intensity interval training",
+  "dayTypeTabata": "Tabata",
+  "dayTypeEdt": "Escalating density training",
+  "dayTypeRft": "Rounds for time",
+  "dayTypeAfap": "As fast as possible",
+  "slotEntryTypeNormal": "Normal",
+  "slotEntryTypeDropset": "Dropset",
+  "slotEntryTypeMyo": "Myo",
+  "slotEntryTypePartial": "Partial",
+  "slotEntryTypeForced": "Forced",
+  "slotEntryTypeTut": "Time under Tension",
+  "slotEntryTypeIso": "Isometric hold",
+  "slotEntryTypeJump": "Jump",
   "routines": "Routines",
   "newRoutine": "New routine",
   "noRoutines": "You have no routines",
@@ -214,6 +232,9 @@
   "@comment": {
     "description": "Comment, additional information"
   },
+  "impressionGood": "Good",
+  "impressionNeutral": "Neutral",
+  "impressionBad": "Bad",
   "impression": "Impression",
   "@impression": {
     "description": "General impression (e.g. for a workout session) such as good, bad, etc."
@@ -245,6 +266,33 @@
   "@gymMode": {
     "description": "Label when starting the gym mode"
   },
+  "gymModeShowExercises": "Show exercise overview pages",
+  "gymModeShowTimer": "Show timer between sets",
+  "gymModeTimerType": "Timer type",
+  "gymModeTimerTypeHelText": "If a set has pause time, a countdown is always used.",
+  "countdown": "Countdown",
+  "stopwatch": "Stopwatch",
+  "gymModeDefaultCountdownTime": "Default countdown time, in seconds",
+  "gymModeNotifyOnCountdownFinish": "Notify on countdown end",
+  "duration": "Duration",
+  "durationHoursMinutes": "{hours}h {minutes}m",
+  "@durationHoursMinutes": {
+    "description": "A duration, in hours and minutes",
+    "type": "text",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "volume": "Volume",
+  "@volume": {
+    "description": "The volume of a workout or set, i.e. weight x reps"
+  },
+  "workoutCompleted": "Workout completed",
   "plateCalculator": "Plates",
   "@plateCalculator": {
     "description": "Label used for the plate calculator in the gym mode"
@@ -387,13 +435,9 @@
   "@date": {
     "description": "The date of a workout log or body weight entry"
   },
-  "creationDate": "Start date",
-  "@creationDate": {
-    "description": "The Start date of a nutritional plan"
-  },
   "endDate": "End date",
   "@endDate": {
-    "description": "The End date of a nutritional plan"
+    "description": "The End date of a nutritional plan or routine"
   },
   "openEnded": "Open ended",
   "@openEnded": {
@@ -578,6 +622,7 @@
   },
   "newNutritionalPlan": "New nutritional plan",
   "@newNutritionalPlan": {},
+  "overview": "Overview",
   "toggleDetails": "Toggle details",
   "@toggleDetails": {
     "description": "Switch to toggle detail / overview"
@@ -625,6 +670,19 @@
       },
       "max": {
         "type": "String"
+      }
+    }
+  },
+  "formMinMaxValues": "Please enter a value between {min} and {max}",
+  "@formMinMaxValues": {
+    "description": "Error message when the user needs to enter a value between min and max",
+    "type": "text",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
       }
     }
   },
@@ -726,7 +784,75 @@
   "@close": {
     "description": "Translation for close"
   },
+  "identicalExercisePleaseDiscard": "If you notice an exercise that is identical to the one you're adding, please discard your draft and edit that exercise instead.",
+  "checkInformationBeforeSubmitting": "Please check that the information you entered is correct before submitting the exercise",
   "add_exercise_image_license": "Images must be compatible with the CC BY SA license. If in doubt, upload only photos you've taken yourself.",
+  "imageDetailsTitle": "Image details",
+  "@imageDetailsTitle": {
+    "description": "Title for image details form"
+  },
+  "imageDetailsLicenseTitle": "Title",
+  "@imageDetailsLicenseTitle": {
+    "description": "Label for image title field"
+  },
+  "imageDetailsLicenseTitleHint": "Enter image title",
+  "@imageDetailsLicenseTitleHint": {
+    "description": "Hint text for image title field"
+  },
+  "imageDetailsSourceLink": "Link to the source website",
+  "@imageDetailsSourceLink": {
+    "description": "Label for source link field"
+  },
+  "author": "Author(s)",
+  "@Author": {
+    "description": "Label for author field"
+  },
+  "authorHint": "Enter author name",
+  "@authorHint": {
+    "description": "Hint text for author field"
+  },
+  "imageDetailsAuthorLink": "Link to author website or profile",
+  "@imageDetailsAuthorLink": {
+    "description": "Label for author link field"
+  },
+  "imageDetailsDerivativeSource": "Link to the original source, if this is a derivative work",
+  "@imageDetailsDerivativeSource": {
+    "description": "Label for derivative source field"
+  },
+  "imageDetailsDerivativeHelp": "A derivative work is based on a previous work but contains sufficient new, creative content to entitle it to its own copyright.",
+  "@imageDetailsDerivativeHelp": {
+    "description": "Helper text explaining derivative works"
+  },
+  "imageDetailsImageType": "Image Type",
+  "@imageDetailsImageType": {
+    "description": "Label for image type selector"
+  },
+  "imageDetailsLicenseNotice": "By submitting this image, you agree to release it under the CC-BY-SA-4. The image must be either your own work or the author must have released it under a license compatible with it.",
+  "imageDetailsLicenseNoticeLinkToLicense": "See license text.",
+  "imageFormatNotSupported": "{imageFormat} not supported",
+  "@imageFormatNotSupported": {
+      "description": "Label shown on the error container when image format is not supported",
+      "type": "text",
+      "placeholders": {
+          "imageFormat": {
+              "type": "String"
+          }
+      }
+  },
+  "imageFormatNotSupportedDetail": "{imageFormat} images are not supported yet.",
+  "@imageFormatNotSupportedDetail": {
+      "description": "Label shown on the image preview container when image format is not supported",
+      "type": "text",
+      "placeholders": {
+          "imageFormat": {
+              "type": "String"
+          }
+      }
+  },
+  "add": "add",
+  "@add": {
+    "description": "Add button text"
+  },
   "variations": "Variations",
   "@variations": {
     "description": "Variations of one exercise (e.g. benchpress and benchpress narrow)"
@@ -762,6 +888,7 @@
   "fitInWeek": "Fit in week",
   "fitInWeekHelp": "If enabled, the days will repeat in a weekly cycle, otherwise the days will follow sequentially without regards to the start of a new week.",
   "addSuperset": "Add superset",
+  "superset": "Superset",
   "setHasProgression": "Set has progression",
   "setHasProgressionWarning": "Please note that at the moment it is not possible to edit all settings for a set on the mobile application or configure automatic progression. For now, please use the web application.",
   "setHasNoExercises": "This set has no exercises yet!",
@@ -772,6 +899,7 @@
   "@baseData": {
     "description": "The base data for an exercise such as category, trained muscles, etc."
   },
+  "enterTextInLanguage": "Please enter the text in the correct language!",
   "settingsTitle": "Settings",
   "settingsCacheTitle": "Cache",
   "settingsExerciseCacheDescription": "Exercise cache",
@@ -978,6 +1106,10 @@
   "indicatorAvg": "avg",
   "@indicatorAvg": {
     "description": "added for localization of Class Indicator's field text"
+  },
+  "endWorkout": "End workout",
+  "@endWorkout": {
+    "description": "Use the imperative, label on button to finish the current workout in gym mode"
   },
   "themeMode": "Theme mode",
   "darkMode": "Always dark mode",

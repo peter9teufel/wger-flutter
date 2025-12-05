@@ -22,16 +22,23 @@ import 'package:wger/models/body_weight/weight_entry.dart';
 void main() {
   group('fetchPost', () {
     test('Test that the weight entries are correctly converted to json', () {
-      WeightEntry weightEntry = WeightEntry(id: 1, weight: 80, date: DateTime(2020, 12, 31));
-      expect(weightEntry.toJson(), {'id': 1, 'weight': '80', 'date': '2020-12-31'});
+      expect(
+        WeightEntry(id: 1, weight: 80, date: DateTime.utc(2020, 12, 31, 12, 34)).toJson(),
+        {'id': 1, 'weight': '80', 'date': '2020-12-31T12:34:00.000Z'},
+      );
 
-      weightEntry = WeightEntry(id: 2, weight: 70.2, date: DateTime(2020, 12, 01));
-      expect(weightEntry.toJson(), {'id': 2, 'weight': '70.2', 'date': '2020-12-01'});
+      expect(
+        WeightEntry(id: 2, weight: 70.2, date: DateTime.utc(2020, 12, 01)).toJson(),
+        {'id': 2, 'weight': '70.2', 'date': '2020-12-01T00:00:00.000Z'},
+      );
     });
 
     test('Test that the weight entries are correctly converted from json', () {
-      final WeightEntry weightEntryObj =
-          WeightEntry(id: 1, weight: 80, date: DateTime(2020, 12, 31));
+      final WeightEntry weightEntryObj = WeightEntry(
+        id: 1,
+        weight: 80,
+        date: DateTime(2020, 12, 31),
+      );
       final WeightEntry weightEntry = WeightEntry.fromJson({
         'id': 1,
         'weight': '80',
@@ -46,12 +53,11 @@ void main() {
   group('model', () {
     test('Test the individual values from the model', () {
       WeightEntry weightModel;
-      //_weightModel = WeightEntry();
-      weightModel = WeightEntry(id: 1, weight: 80, date: DateTime(2020, 10, 01));
+      weightModel = WeightEntry(id: 1, weight: 80, date: DateTime.utc(2020, 10, 01));
 
       expect(weightModel.id, 1);
       expect(weightModel.weight, 80);
-      expect(weightModel.date, DateTime(2020, 10, 01));
+      expect(weightModel.date, DateTime.utc(2020, 10, 01));
     });
   });
 }

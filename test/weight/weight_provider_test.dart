@@ -70,12 +70,16 @@ void main() {
         path: 'api/v2/weightentry/',
       );
       when(mockBaseProvider.makeUrl(any, query: anyNamed('query'))).thenReturn(uri);
-      when(mockBaseProvider.post({'id': null, 'weight': '80', 'date': '2021-01-01'}, uri))
-          .thenAnswer((_) => Future.value({'id': 25, 'date': '2021-01-01', 'weight': '80'}));
+      when(
+        mockBaseProvider.post(
+          {'id': null, 'weight': '80', 'date': '2021-01-01T00:00:00.000Z'},
+          uri,
+        ),
+      ).thenAnswer((_) => Future.value({'id': 25, 'date': '2021-01-01', 'weight': '80'}));
 
       // Act
       final BodyWeightProvider provider = BodyWeightProvider(mockBaseProvider);
-      final WeightEntry weightEntry = WeightEntry(date: DateTime(2021, 1, 1), weight: 80);
+      final WeightEntry weightEntry = WeightEntry(date: DateTime.utc(2021, 1, 1), weight: 80);
       final WeightEntry weightEntryNew = await provider.addEntry(weightEntry);
 
       // Assert

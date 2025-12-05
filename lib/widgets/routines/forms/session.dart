@@ -37,16 +37,17 @@ class SessionForm extends StatefulWidget {
   static const SLIDER_START = -0.5;
 
   SessionForm(this._routineId, {Function()? onSaved, WorkoutSession? session, int? dayId})
-      : _onSaved = onSaved,
-        _session = session ??
-            WorkoutSession(
-              routineId: _routineId,
-              dayId: dayId,
-              impression: DEFAULT_IMPRESSION,
-              date: clock.now(),
-              timeEnd: TimeOfDay.fromDateTime(clock.now()),
-              timeStart: null,
-            );
+    : _onSaved = onSaved,
+      _session =
+          session ??
+          WorkoutSession(
+            routineId: _routineId,
+            dayId: dayId,
+            impression: DEFAULT_IMPRESSION,
+            date: clock.now(),
+            timeEnd: TimeOfDay.fromDateTime(clock.now()),
+            timeStart: null,
+          );
 
   @override
   _SessionFormState createState() => _SessionFormState();
@@ -68,10 +69,12 @@ class _SessionFormState extends State<SessionForm> {
   void initState() {
     super.initState();
 
-    timeStartController.text =
-        widget._session.timeStart == null ? '' : timeToString(widget._session.timeStart)!;
-    timeEndController.text =
-        widget._session.timeEnd == null ? '' : timeToString(widget._session.timeEnd)!;
+    timeStartController.text = widget._session.timeStart == null
+        ? ''
+        : timeToString(widget._session.timeStart)!;
+    timeEndController.text = widget._session.timeEnd == null
+        ? ''
+        : timeToString(widget._session.timeEnd)!;
     notesController.text = widget._session.notes;
 
     selectedImpression[widget._session.impression - 1] = true;
@@ -139,6 +142,15 @@ class _SessionFormState extends State<SessionForm> {
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context).timeStart,
                     errorMaxLines: 2,
+                    suffix: IconButton(
+                      onPressed: () => {
+                        setState(() {
+                          timeStartController.text = '';
+                          widget._session.timeStart = null;
+                        }),
+                      },
+                      icon: const Icon(Icons.clear),
+                    ),
                   ),
                   controller: timeStartController,
                   onFieldSubmitted: (_) {},
@@ -184,6 +196,15 @@ class _SessionFormState extends State<SessionForm> {
                   key: const ValueKey('time-end'),
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context).timeEnd,
+                    suffix: IconButton(
+                      onPressed: () => {
+                        setState(() {
+                          timeEndController.text = '';
+                          widget._session.timeEnd = null;
+                        }),
+                      },
+                      icon: const Icon(Icons.clear),
+                    ),
                   ),
                   controller: timeEndController,
                   onFieldSubmitted: (_) {},

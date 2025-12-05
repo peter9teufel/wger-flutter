@@ -23,11 +23,10 @@ import 'package:provider/provider.dart' as provider;
 import 'package:wger/exceptions/http_exception.dart';
 import 'package:wger/helpers/consts.dart';
 import 'package:wger/l10n/generated/app_localizations.dart';
-import 'package:wger/models/exercises/exercise.dart';
 import 'package:wger/models/workouts/log.dart';
-import 'package:wger/models/workouts/routine.dart';
 import 'package:wger/models/workouts/set_config_data.dart';
-import 'package:wger/models/workouts/slot_data.dart';
+import 'package:wger/models/workouts/slot_entry.dart';
+import 'package:wger/providers/gym_state.dart';
 import 'package:wger/providers/plate_weights.dart';
 import 'package:wger/providers/routines.dart';
 import 'package:wger/screens/configure_plates_screen.dart';
@@ -40,38 +39,18 @@ import 'package:wger/widgets/routines/gym_mode/navigation.dart';
 import 'package:wger/widgets/routines/plate_calculator.dart';
 
 class LogPage extends ConsumerStatefulWidget {
-  final PageController _controller;
-  final SetConfigData _configData;
-  final SlotData _slotData;
-  final Exercise _exercise;
-  final Routine _workoutPlan;
-  final double _ratioCompleted;
-  final Map<Exercise, int> _exercisePages;
-  final Log _log;
+  final _logger = Logger('LogPage');
 
-  LogPage(
-    this._controller,
-    this._configData,
-    this._slotData,
-    this._exercise,
-    this._workoutPlan,
-    this._ratioCompleted,
-    this._exercisePages,
-    int? iteration,
-  ) : _log = Log.fromSetConfigData(_configData)
-          ..routineId = _workoutPlan.id!
-          ..iteration = iteration;
+  final PageController _controller;
+
+  LogPage(this._controller);
 
   @override
   _LogPageState createState() => _LogPageState();
 }
 
 class _LogPageState extends ConsumerState<LogPage> {
-  final _form = GlobalKey<FormState>();
-  final _repetitionsController = TextEditingController();
-  final _weightController = TextEditingController();
-  var _detailed = false;
-  bool _isSaving = false;
+  final GlobalKey<_LogFormWidgetState> _logFormKey = GlobalKey<_LogFormWidgetState>();
 
   late FocusNode focusNode;
 
@@ -79,222 +58,103 @@ class _LogPageState extends ConsumerState<LogPage> {
   void initState() {
     super.initState();
     focusNode = FocusNode();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final locale = Localizations.localeOf(context).toString();
-      final numberFormat = NumberFormat.decimalPattern(locale);
-
-      if (widget._configData.repetitions != null) {
-        _repetitionsController.text = numberFormat.format(widget._configData.repetitions);
-      }
-
-      if (widget._configData.weight != null) {
-        _weightController.text = numberFormat.format(widget._configData.weight);
-      }
-    });
   }
 
   @override
   void dispose() {
     focusNode.dispose();
-    _repetitionsController.dispose();
-    _weightController.dispose();
     super.dispose();
-  }
-
-  Widget getForm() {
-    return Form(
-      key: _form,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            AppLocalizations.of(context).newEntry,
-            style: Theme.of(context).textTheme.titleLarge,
-            textAlign: TextAlign.center,
-          ),
-          if (!_detailed)
-            Row(
-              children: [
-                Flexible(
-                  child: LogsRepsWidget(
-                    controller: _repetitionsController,
-                    configData: widget._configData,
-                    focusNode: focusNode,
-                    log: widget._log,
-                    setStateCallback: (fn) {
-                      setState(fn);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: LogsWeightWidget(
-                    controller: _weightController,
-                    configData: widget._configData,
-                    focusNode: focusNode,
-                    log: widget._log,
-                    setStateCallback: (fn) {
-                      setState(fn);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          if (_detailed)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Flexible(
-                  child: LogsRepsWidget(
-                    controller: _repetitionsController,
-                    configData: widget._configData,
-                    focusNode: focusNode,
-                    log: widget._log,
-                    setStateCallback: (fn) {
-                      setState(fn);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: RepetitionUnitInputWidget(
-                    widget._log.repetitionsUnitId,
-                    onChanged: (v) => {},
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
-            ),
-          if (_detailed)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Flexible(
-                  child: LogsWeightWidget(
-                    controller: _weightController,
-                    configData: widget._configData,
-                    focusNode: focusNode,
-                    log: widget._log,
-                    setStateCallback: (fn) {
-                      setState(fn);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: WeightUnitInputWidget(widget._log.weightUnitId, onChanged: (v) => {}),
-                ),
-                const SizedBox(width: 8),
-              ],
-            ),
-          if (_detailed)
-            RiRInputWidget(
-              widget._log.rir,
-              onChanged: (value) {
-                if (value == '') {
-                  widget._log.rir = null;
-                } else {
-                  widget._log.rir = num.parse(value);
-                }
-              },
-            ),
-          SwitchListTile(
-            dense: true,
-            title: Text(AppLocalizations.of(context).setUnitsAndRir),
-            value: _detailed,
-            onChanged: (value) {
-              setState(() {
-                _detailed = !_detailed;
-              });
-            },
-          ),
-          FilledButton(
-            onPressed: _isSaving
-                ? null
-                : () async {
-                    // Validate and save the current values to the weightEntry
-                    final isValid = _form.currentState!.validate();
-                    if (!isValid) {
-                      return;
-                    }
-                    _isSaving = true;
-                    _form.currentState!.save();
-
-                    // Save the entry on the server
-                    try {
-                      await provider.Provider.of<RoutinesProvider>(
-                        context,
-                        listen: false,
-                      ).addLog(widget._log);
-
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            duration: const Duration(seconds: 2), // default is 4
-                            content: Text(
-                              AppLocalizations.of(context).successfullySaved,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
-                      }
-                      widget._controller.nextPage(
-                        duration: DEFAULT_ANIMATION_DURATION,
-                        curve: DEFAULT_ANIMATION_CURVE,
-                      );
-                      _isSaving = false;
-                    } on WgerHttpException {
-                      _isSaving = false;
-
-                      rethrow;
-                    }
-                  },
-            child:
-                _isSaving ? const FormProgressIndicator() : Text(AppLocalizations.of(context).save),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final state = ref.watch(gymStateProvider);
+
+    final page = state.getPageByIndex();
+    if (page == null) {
+      widget._logger.info(
+        'getPageByIndex for ${state.currentPage} returned null, showing empty container.',
+      );
+      return Container();
+    }
+
+    final slotEntryPage = state.getSlotEntryPageByIndex();
+    if (slotEntryPage == null) {
+      widget._logger.info(
+        'getSlotPageByIndex for ${state.currentPage} returned null, showing empty container',
+      );
+      return Container();
+    }
+
+    final setConfigData = slotEntryPage.setConfigData!;
+
+    final log = Log.fromSetConfigData(setConfigData)
+      ..routineId = state.routine.id!
+      ..iteration = state.iteration;
+
+    // Mark done sets
+    final decorationStyle = slotEntryPage.logDone
+        ? TextDecoration.lineThrough
+        : TextDecoration.none;
+
     return Column(
       children: [
         NavigationHeader(
-          widget._exercise.getTranslation(Localizations.localeOf(context).languageCode).name,
+          log.exercise.getTranslation(Localizations.localeOf(context).languageCode).name,
           widget._controller,
-          exercisePages: widget._exercisePages,
         ),
 
         Container(
-          color: Theme.of(context).colorScheme.onInverseSurface,
+          color: theme.colorScheme.onInverseSurface,
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Center(
-            child: Text(
-              widget._configData.textRepr,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.copyWith(color: Theme.of(context).colorScheme.primary),
-              textAlign: TextAlign.center,
+            child: Column(
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      setConfigData.textRepr,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        decoration: decorationStyle,
+                      ),
+                    ),
+                    if (setConfigData.type != SlotEntryType.normal)
+                      Text(
+                        setConfigData.type.name.toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          decoration: decorationStyle,
+                        ),
+                      ),
+                  ],
+                ),
+                Text(
+                  '${slotEntryPage.setIndex + 1} / ${page.slotPages.where((e) => e.type == SlotPageType.log).length}',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ),
-        if (widget._slotData.comment.isNotEmpty)
-          Text(widget._slotData.comment, textAlign: TextAlign.center),
-        // Only show calculator for barbell
-        if (widget._log.exercise.equipment.map((e) => e.id).contains(ID_EQUIPMENT_BARBELL))
-          const LogsPlatesWidget(),
+        if (log.exercise.showPlateCalculator) const LogsPlatesWidget(),
+        if (slotEntryPage.setConfigData!.comment.isNotEmpty)
+          Text(slotEntryPage.setConfigData!.comment, textAlign: TextAlign.center),
         const SizedBox(height: 10),
         Expanded(
-          child: (widget._workoutPlan.filterLogsByExercise(widget._exercise.id!).isNotEmpty)
+          child: (state.routine.filterLogsByExercise(log.exercise.id!).isNotEmpty)
               ? LogsPastLogsWidget(
-                  weightController: _weightController,
-                  repetitionsController: _repetitionsController,
-                  log: widget._log,
-                  pastLogs: widget._workoutPlan.filterLogsByExercise(widget._exercise.id!),
+                  log: log,
+                  pastLogs: state.routine.filterLogsByExercise(log.exercise.id!),
+                  onCopy: (pastLog) {
+                    _logFormKey.currentState?.copyFromPastLog(pastLog);
+                  },
                   setStateCallback: (fn) {
                     setState(fn);
                   },
@@ -309,11 +169,17 @@ class _LogPageState extends ConsumerState<LogPage> {
             // color: Theme.of(context).secondaryHeaderColor,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
-              child: getForm(),
+              child: LogFormWidget(
+                key: _logFormKey,
+                controller: widget._controller,
+                configData: setConfigData,
+                log: log,
+                focusNode: focusNode,
+              ),
             ),
           ),
         ),
-        NavigationFooter(widget._controller, widget._ratioCompleted),
+        NavigationFooter(widget._controller),
       ],
     );
   }
@@ -434,7 +300,6 @@ class LogsRepsWidget extends StatelessWidget {
               _logger.info('Saving new reps value: $newValue');
               setStateCallback(() {
                 log.repetitions = numberFormat.parse(newValue!);
-                // focusNode.unfocus();
               });
             },
             validator: (value) {
@@ -448,8 +313,10 @@ class LogsRepsWidget extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.add, color: Colors.black),
           onPressed: () {
+            final value = controller.text.isNotEmpty ? controller.text : '0';
+
             try {
-              final newValue = numberFormat.parse(controller.text) + repsValueChange;
+              final newValue = numberFormat.parse(value) + repsValueChange;
               setStateCallback(() {
                 log.repetitions = newValue;
                 controller.text = numberFormat.format(newValue);
@@ -499,7 +366,9 @@ class LogsWeightWidget extends ConsumerWidget {
                 setStateCallback(() {
                   log.weight = newValue;
                   controller.text = numberFormat.format(newValue);
-                  ref.read(plateCalculatorProvider.notifier).setWeight(
+                  ref
+                      .read(plateCalculatorProvider.notifier)
+                      .setWeight(
                         controller.text == '' ? 0 : newValue,
                       );
                 });
@@ -519,7 +388,9 @@ class LogsWeightWidget extends ConsumerWidget {
                 final newValue = numberFormat.parse(value);
                 setStateCallback(() {
                   log.weight = newValue;
-                  ref.read(plateCalculatorProvider.notifier).setWeight(
+                  ref
+                      .read(plateCalculatorProvider.notifier)
+                      .setWeight(
                         controller.text == '' ? 0 : numberFormat.parse(controller.text),
                       );
                 });
@@ -543,12 +414,16 @@ class LogsWeightWidget extends ConsumerWidget {
         IconButton(
           icon: const Icon(Icons.add, color: Colors.black),
           onPressed: () {
+            final value = controller.text.isNotEmpty ? controller.text : '0';
+
             try {
-              final newValue = numberFormat.parse(controller.text) + weightValueChange;
+              final newValue = numberFormat.parse(value) + weightValueChange;
               setStateCallback(() {
                 log.weight = newValue;
                 controller.text = numberFormat.format(newValue);
-                ref.read(plateCalculatorProvider.notifier).setWeight(
+                ref
+                    .read(plateCalculatorProvider.notifier)
+                    .setWeight(
                       controller.text == '' ? 0 : newValue,
                     );
               });
@@ -563,25 +438,21 @@ class LogsWeightWidget extends ConsumerWidget {
 }
 
 class LogsPastLogsWidget extends StatelessWidget {
-  final TextEditingController weightController;
-  final TextEditingController repetitionsController;
   final Log log;
   final List<Log> pastLogs;
+  final void Function(Log pastLog) onCopy;
   final void Function(VoidCallback fn) setStateCallback;
 
   const LogsPastLogsWidget({
     super.key,
-    required this.weightController,
-    required this.repetitionsController,
     required this.log,
     required this.pastLogs,
+    required this.onCopy,
     required this.setStateCallback,
   });
 
   @override
   Widget build(BuildContext context) {
-    final numberFormat = NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
-
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ListView(
@@ -593,33 +464,276 @@ class LogsPastLogsWidget extends StatelessWidget {
           ),
           ...pastLogs.map((pastLog) {
             return ListTile(
-              title: Text(pastLog.singleLogRepTextNoNl),
+              key: ValueKey('past-log-${pastLog.id}'),
+              title: Text(pastLog.repTextNoNl(context)),
               subtitle: Text(
                 DateFormat.yMd(Localizations.localeOf(context).languageCode).format(pastLog.date),
               ),
               trailing: const Icon(Icons.copy),
               onTap: () {
                 setStateCallback(() {
-                  // Text field
-                  repetitionsController.text =
-                      pastLog.repetitions != null ? numberFormat.format(pastLog.repetitions) : '';
-                  weightController.text =
-                      pastLog.weight != null ? numberFormat.format(pastLog.weight) : '';
-
-                  // Drop downs
                   log.rir = pastLog.rir;
                   log.repetitionUnit = pastLog.repetitionsUnitObj;
                   log.weightUnit = pastLog.weightUnitObj;
 
+                  onCopy(pastLog);
+
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(AppLocalizations.of(context).dataCopied),
-                  ));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context).dataCopied),
+                    ),
+                  );
                 });
               },
               contentPadding: const EdgeInsets.symmetric(horizontal: 40),
             );
           }),
+        ],
+      ),
+    );
+  }
+}
+
+class LogFormWidget extends ConsumerStatefulWidget {
+  final _logger = Logger('LogFormWidget');
+
+  final PageController controller;
+  final SetConfigData configData;
+  final Log log;
+  final FocusNode focusNode;
+
+  LogFormWidget({
+    super.key,
+    required this.controller,
+    required this.configData,
+    required this.log,
+    required this.focusNode,
+  });
+
+  @override
+  _LogFormWidgetState createState() => _LogFormWidgetState();
+}
+
+class _LogFormWidgetState extends ConsumerState<LogFormWidget> {
+  final _form = GlobalKey<FormState>();
+  var _detailed = false;
+  bool _isSaving = false;
+  late Log _log;
+
+  late final TextEditingController _repetitionsController;
+  late final TextEditingController _weightController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _log = widget.log;
+    _repetitionsController = TextEditingController();
+    _weightController = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final locale = Localizations.localeOf(context).toString();
+      final numberFormat = NumberFormat.decimalPattern(locale);
+
+      if (widget.configData.repetitions != null) {
+        _repetitionsController.text = numberFormat.format(widget.configData.repetitions);
+      }
+
+      if (widget.configData.weight != null) {
+        _weightController.text = numberFormat.format(widget.configData.weight);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _repetitionsController.dispose();
+    _weightController.dispose();
+    super.dispose();
+  }
+
+  void copyFromPastLog(Log pastLog) {
+    final locale = Localizations.localeOf(context).toString();
+    final numberFormat = NumberFormat.decimalPattern(locale);
+
+    setState(() {
+      _repetitionsController.text = pastLog.repetitions != null
+          ? numberFormat.format(pastLog.repetitions)
+          : '';
+      widget._logger.finer('Setting log repetitions to ${_repetitionsController.text}');
+
+      _weightController.text = pastLog.weight != null ? numberFormat.format(pastLog.weight) : '';
+      widget._logger.finer('Setting log weight to ${_weightController.text}');
+
+      _log.rir = pastLog.rir;
+      widget._logger.finer('Setting log rir to ${_log.rir}');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final i18n = AppLocalizations.of(context);
+
+    return Form(
+      key: _form,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            i18n.newEntry,
+            style: Theme.of(context).textTheme.titleLarge,
+            textAlign: TextAlign.center,
+          ),
+          if (!_detailed)
+            Row(
+              children: [
+                Flexible(
+                  child: LogsRepsWidget(
+                    controller: _repetitionsController,
+                    configData: widget.configData,
+                    focusNode: widget.focusNode,
+                    log: _log,
+                    setStateCallback: (fn) {
+                      setState(fn);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: LogsWeightWidget(
+                    controller: _weightController,
+                    configData: widget.configData,
+                    focusNode: widget.focusNode,
+                    log: _log,
+                    setStateCallback: (fn) {
+                      setState(fn);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          if (_detailed)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: LogsRepsWidget(
+                    controller: _repetitionsController,
+                    configData: widget.configData,
+                    focusNode: widget.focusNode,
+                    log: _log,
+                    setStateCallback: (fn) {
+                      setState(fn);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: RepetitionUnitInputWidget(
+                    _log.repetitionsUnitId,
+                    onChanged: (v) => {},
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+            ),
+          if (_detailed)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: LogsWeightWidget(
+                    controller: _weightController,
+                    configData: widget.configData,
+                    focusNode: widget.focusNode,
+                    log: _log,
+                    setStateCallback: (fn) {
+                      setState(fn);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: WeightUnitInputWidget(_log.weightUnitId, onChanged: (v) => {}),
+                ),
+                const SizedBox(width: 8),
+              ],
+            ),
+          if (_detailed)
+            RiRInputWidget(
+              _log.rir,
+              onChanged: (value) {
+                if (value == '') {
+                  _log.rir = null;
+                } else {
+                  _log.rir = num.parse(value);
+                }
+              },
+            ),
+          SwitchListTile(
+            dense: true,
+            title: Text(i18n.setUnitsAndRir),
+            value: _detailed,
+            onChanged: (value) {
+              setState(() {
+                _detailed = !_detailed;
+              });
+            },
+          ),
+          FilledButton(
+            onPressed: _isSaving
+                ? null
+                : () async {
+                    final isValid = _form.currentState!.validate();
+                    if (!isValid) {
+                      return;
+                    }
+                    _isSaving = true;
+                    _form.currentState!.save();
+
+                    try {
+                      final gymState = ref.read(gymStateProvider);
+                      final gymProvider = ref.read(gymStateProvider.notifier);
+
+                      await provider.Provider.of<RoutinesProvider>(
+                        context,
+                        listen: false,
+                      ).addLog(_log);
+                      final page = gymState.getSlotEntryPageByIndex()!;
+                      gymProvider.markSlotPageAsDone(page.uuid, isDone: true);
+
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            duration: const Duration(seconds: 2),
+                            content: Text(
+                              i18n.successfullySaved,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+                      widget.controller.nextPage(
+                        duration: DEFAULT_ANIMATION_DURATION,
+                        curve: DEFAULT_ANIMATION_CURVE,
+                      );
+                      setState(() {
+                        _isSaving = false;
+                      });
+                    } on WgerHttpException {
+                      setState(() {
+                        _isSaving = false;
+                      });
+                      rethrow;
+                    } finally {
+                      setState(() {
+                        _isSaving = false;
+                      });
+                    }
+                  },
+            child: _isSaving ? const FormProgressIndicator() : Text(i18n.save),
+          ),
         ],
       ),
     );

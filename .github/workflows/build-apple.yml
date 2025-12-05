@@ -11,11 +11,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout application
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
 
       # This seems to be related to https://github.com/actions/runner-images/issues/12758
+      # Select appropriate Xcode version from
+      # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md#xcode
       - name: Xcode setup
         run: |
           sudo xcode-select --switch /Applications/Xcode_16.4.app
@@ -29,17 +31,17 @@ jobs:
           cd build/ios/iphoneos
           zip -r Runner.app.zip Runner.app
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: builds-ios
-          path: build/ios/iphoneos/Runner.app
+          path: build/ios/iphoneos/Runner.app.zip
 
   build_ipa:
     name: IPA
     runs-on: macos-latest
     steps:
       - name: Checkout application
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
 
@@ -47,6 +49,8 @@ jobs:
         uses: ./.github/actions/flutter-common
 
       # This seems to be related to https://github.com/actions/runner-images/issues/12758
+      # Select appropriate Xcode version from
+      # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md#xcode
       - name: Xcode setup
         run: |
           sudo xcode-select --switch /Applications/Xcode_16.4.app
@@ -57,7 +61,7 @@ jobs:
           cd build/ios/archive
           zip -r Runner.xcarchive.zip Runner.xcarchive
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: builds-ipa
           path: build/ios/archive/Runner.xcarchive.zip
@@ -67,7 +71,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout application
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
 
@@ -80,7 +84,7 @@ jobs:
           cd build/macos/Build/Products/Release
           zip -r wger.app.zip wger.app
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: builds-macos
           path: build/macos/Build/Products/Release/wger.app.zip

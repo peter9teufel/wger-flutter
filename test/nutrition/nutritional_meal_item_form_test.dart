@@ -10,7 +10,6 @@ import 'package:network_image_mock/network_image_mock.dart';
 import 'package:provider/provider.dart';
 import 'package:wger/helpers/consts.dart';
 import 'package:wger/l10n/generated/app_localizations.dart';
-import 'package:wger/models/exercises/ingredient_api.dart';
 import 'package:wger/models/nutrition/ingredient.dart';
 import 'package:wger/models/nutrition/meal.dart';
 import 'package:wger/models/nutrition/meal_item.dart';
@@ -71,18 +70,19 @@ void main() {
     final MealItem mealItem = MealItem(ingredientId: ingredient.id, amount: 2);
     mockNutrition = MockNutritionPlansProvider();
 
-    when(mockNutrition.searchIngredientWithCode('123')).thenAnswer((_) => Future.value(ingredient));
-    when(mockNutrition.searchIngredientWithCode('')).thenAnswer((_) => Future.value(null));
-    when(mockNutrition.searchIngredientWithCode('222')).thenAnswer((_) => Future.value(null));
-    when(mockNutrition.searchIngredient(
-      any,
-      languageCode: anyNamed('languageCode'),
-      searchEnglish: anyNamed('searchEnglish'),
-    )).thenAnswer(
-      (_) => Future.value(
-        IngredientApiSearch.fromJson(json.decode(fixture('nutrition/ingredient_suggestions')))
-            .suggestions,
+    when(
+      mockNutrition.searchIngredientWithBarcode('123'),
+    ).thenAnswer((_) => Future.value(ingredient));
+    when(mockNutrition.searchIngredientWithBarcode('')).thenAnswer((_) => Future.value(null));
+    when(mockNutrition.searchIngredientWithBarcode('222')).thenAnswer((_) => Future.value(null));
+    when(
+      mockNutrition.searchIngredient(
+        any,
+        languageCode: anyNamed('languageCode'),
+        searchEnglish: anyNamed('searchEnglish'),
       ),
+    ).thenAnswer(
+      (_) => Future.value([ingredient1, ingredient2]),
     );
 
     when(mockNutrition.addMealItem(any, meal1)).thenAnswer((_) => Future.value(mealItem));
@@ -115,7 +115,7 @@ void main() {
     await tester.pumpWidget(createMealItemFormScreen(meal1, '', true));
     await tester.pumpAndSettle();
 
-    expect(find.byType(TypeAheadField<IngredientApiSearchEntry>), findsOneWidget);
+    expect(find.byType(TypeAheadField<Ingredient>), findsOneWidget);
     expect(find.byType(TextFormField), findsWidgets);
     expect(find.byKey(const Key('scan-button')), findsOneWidget);
     expect(find.byKey(const Key(SUBMIT_BUTTON_KEY_NAME)), findsOneWidget);
@@ -314,9 +314,11 @@ void main() {
         await tester.enterText(find.byKey(const Key('field-weight')), '2');
 
         // once ID and weight are set, it'll fetchIngredient and show macros preview and ingredient image
-        when(mockNutrition.fetchIngredient(1)).thenAnswer((_) => Future.value(
-              Ingredient.fromJson(jsonDecode(fixture('nutrition/ingredientinfo_59887.json'))),
-            ));
+        when(mockNutrition.fetchIngredient(1)).thenAnswer(
+          (_) => Future.value(
+            Ingredient.fromJson(jsonDecode(fixture('nutrition/ingredientinfo_59887.json'))),
+          ),
+        );
         await mockNetworkImagesFor(() => tester.pumpAndSettle());
 
         expect(find.byKey(const Key('ingredient-scan-result-dialog')), findsNothing);
@@ -329,5 +331,35 @@ void main() {
         verify(mockNutrition.addMealItem(any, meal1));
       },
     );
+
+    testWidgets('selecting ingredient from autocomplete calls cacheIngredient', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createMealItemFormScreen(meal1, '', true));
+      await tester.pumpAndSettle();
+
+      clearInteractions(mockNutrition);
+
+      when(
+        mockNutrition.searchIngredient(
+          any,
+          languageCode: anyNamed('languageCode'),
+          searchEnglish: anyNamed('searchEnglish'),
+        ),
+      ).thenAnswer((_) => Future.value([ingredient1]));
+
+      when(
+        mockNutrition.cacheIngredient(any),
+      ).thenAnswer((_) => Future.value(null));
+
+      await tester.enterText(find.byType(TextFormField).first, 'Water');
+      await tester.pumpAndSettle(const Duration(milliseconds: 600));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(ListTile).first);
+      await tester.pumpAndSettle();
+
+      verify(mockNutrition.cacheIngredient(ingredient1)).called(1);
+    });
   });
 }

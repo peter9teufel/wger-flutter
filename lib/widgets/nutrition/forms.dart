@@ -20,7 +20,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:wger/helpers/consts.dart';
-import 'package:wger/helpers/date.dart';
 import 'package:wger/helpers/json.dart';
 import 'package:wger/l10n/generated/app_localizations.dart';
 import 'package:wger/models/nutrition/ingredient.dart';
@@ -138,8 +137,10 @@ Widget getIngredientLogForm(NutritionalPlan plan) {
   return IngredientForm(
     recent: plan.dedupDiaryEntries,
     onSave: (BuildContext context, MealItem mealItem, DateTime? dt) {
-      Provider.of<NutritionPlansProvider>(context, listen: false)
-          .logIngredientToDiary(mealItem, plan.id!, dt);
+      Provider.of<NutritionPlansProvider>(
+        context,
+        listen: false,
+      ).logIngredientToDiary(mealItem, plan.id!, dt);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -180,17 +181,9 @@ class IngredientFormState extends State<IngredientForm> {
   final _ingredientIdController = TextEditingController();
   final _amountController = TextEditingController();
   final _dateController = TextEditingController(); // optional
-  final _timeController = TextEditingController(); // optional
+  final _timeController = TextEditingController(text: ''); // optional
   final _mealItem = MealItem.empty();
   var _searchQuery = ''; // copy from typeahead. for filtering suggestions
-
-  @override
-  void initState() {
-    super.initState();
-    final now = DateTime.now();
-    _dateController.text = dateToYYYYMMDD(now)!;
-    _timeController.text = timeToString(TimeOfDay.fromDateTime(now))!;
-  }
 
   @override
   void dispose() {
@@ -234,10 +227,22 @@ class IngredientFormState extends State<IngredientForm> {
 
   @override
   Widget build(BuildContext context) {
+    final dateFormat = DateFormat.yMd(Localizations.localeOf(context).languageCode);
+    final timeFormat = DateFormat.Hm(Localizations.localeOf(context).languageCode);
+
+    if (_dateController.text.isEmpty) {
+      _dateController.text = dateFormat.format(DateTime.now());
+    }
+
+    if (_timeController.text.isEmpty) {
+      _timeController.text = timeFormat.format(DateTime.now());
+    }
+
     final String unit = AppLocalizations.of(context).g;
     final queryLower = _searchQuery.toLowerCase();
-    final suggestions =
-        widget.recent.where((e) => e.ingredient.name.toLowerCase().contains(queryLower)).toList();
+    final suggestions = widget.recent
+        .where((e) => e.ingredient.name.toLowerCase().contains(queryLower))
+        .toList();
     final numberFormat = NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
 
     return Container(
@@ -252,8 +257,8 @@ class IngredientFormState extends State<IngredientForm> {
               barcode: widget.barcode,
               test: widget.test,
               selectIngredient: selectIngredient,
-              unSelectIngredient: unSelectIngredient,
-              updateSearchQuery: updateSearchQuery,
+              onDeselectIngredient: unSelectIngredient,
+              onUpdateSearchQuery: updateSearchQuery,
             ),
             Row(
               children: [
@@ -308,7 +313,7 @@ class IngredientFormState extends State<IngredientForm> {
                         );
 
                         if (pickedDate != null) {
-                          _dateController.text = dateToYYYYMMDD(pickedDate)!;
+                          _dateController.text = dateFormat.format(pickedDate);
                         }
                       },
                       onSaved: (newValue) {
@@ -359,31 +364,32 @@ class IngredientFormState extends State<IngredientForm> {
                         context,
                         listen: false,
                       ).fetchIngredient(_mealItem.ingredientId),
-                      builder: (
-                        BuildContext context,
-                        AsyncSnapshot<Ingredient> snapshot,
-                      ) {
-                        if (snapshot.hasData) {
-                          _mealItem.ingredient = snapshot.data!;
-                          return MealItemValuesTile(
-                            ingredient: _mealItem.ingredient,
-                            nutritionalValues: _mealItem.nutritionalValues,
-                          );
-                        } else if (snapshot.hasError) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 16),
-                            child: Text(
-                              'Ingredient lookup error: ${snapshot.error}',
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          );
-                        }
-                        return const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(),
-                        );
-                      },
+                      builder:
+                          (
+                            BuildContext context,
+                            AsyncSnapshot<Ingredient> snapshot,
+                          ) {
+                            if (snapshot.hasData) {
+                              _mealItem.ingredient = snapshot.data!;
+                              return MealItemValuesTile(
+                                ingredient: _mealItem.ingredient,
+                                nutritionalValues: _mealItem.nutritionalValues,
+                              );
+                            } else if (snapshot.hasError) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: Text(
+                                  'Ingredient lookup error: ${snapshot.error}',
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              );
+                            }
+                            return const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(),
+                            );
+                          },
                     ),
                   ],
                 ),
@@ -398,9 +404,8 @@ class IngredientFormState extends State<IngredientForm> {
                 _form.currentState!.save();
                 _mealItem.ingredientId = int.parse(_ingredientIdController.text);
 
-                final loggedDate = getDateTimeFromDateAndTime(
-                  _dateController.text,
-                  _timeController.text,
+                final loggedDate = dateFormat.parse(
+                  '${_dateController.text} ${_timeController.text}',
                 );
                 widget.onSave(context, _mealItem, loggedDate);
 
@@ -432,10 +437,12 @@ class IngredientFormState extends State<IngredientForm> {
                       title: Text(
                         '${suggestions[index].ingredient.name} (${suggestions[index].amount.toStringAsFixed(0)}$unit)',
                       ),
-                      subtitle: Text(getShortNutritionValues(
-                        suggestions[index].ingredient.nutritionalValues,
-                        context,
-                      )),
+                      subtitle: Text(
+                        getShortNutritionValues(
+                          suggestions[index].ingredient.nutritionalValues,
+                          context,
+                        ),
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

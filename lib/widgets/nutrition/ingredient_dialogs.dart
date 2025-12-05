@@ -61,7 +61,7 @@ Widget ingredientImage(String url, BuildContext context) {
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -101,8 +101,7 @@ class IngredientDetails extends StatelessWidget {
                   'Ingredient lookup error: ${snapshot.error ?? 'unknown error'}',
                   style: const TextStyle(color: Colors.red),
                 ),
-              if (ingredient?.image?.image != null)
-                ingredientImage(ingredient!.image!.image, context),
+              if (ingredient?.image?.url != null) ingredientImage(ingredient!.image!.url, context),
               if (!snapshot.hasData && !snapshot.hasError) const CircularProgressIndicator(),
               if (snapshot.hasData)
                 ConstrainedBox(
@@ -202,11 +201,11 @@ class IngredientScanResultDialog extends StatelessWidget {
               if (ingredient != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
-                  child:
-                      Text(AppLocalizations.of(context).productFoundDescription(ingredient.name)),
+                  child: Text(
+                    AppLocalizations.of(context).productFoundDescription(ingredient.name),
+                  ),
                 ),
-              if (ingredient?.image?.image != null)
-                ingredientImage(ingredient!.image!.image, context),
+              if (ingredient?.image?.url != null) ingredientImage(ingredient!.image!.url, context),
               if (snapshot.connectionState != ConnectionState.done && !snapshot.hasError)
                 const CircularProgressIndicator(),
               if (goals != null)

@@ -27,7 +27,6 @@ import 'package:wger/helpers/consts.dart';
 import 'package:wger/helpers/misc.dart';
 import 'package:wger/helpers/platform.dart';
 import 'package:wger/l10n/generated/app_localizations.dart';
-import 'package:wger/models/exercises/ingredient_api.dart';
 import 'package:wger/models/nutrition/ingredient.dart';
 import 'package:wger/providers/nutrition.dart';
 import 'package:wger/widgets/core/core.dart';
@@ -39,19 +38,19 @@ class ScanReader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: ReaderWidget(
-          onScan: (result) {
-            // notes:
-            // 1. even if result.isValid, result.error is always non-null (and set to "")
-            // 2. i've never encountered scan errors to see when they occur, and
-            //    i wouldn't know what to do about them anyway, so we simply return
-            //    result.text in such case (which presumably will be null, or "")
-            // 3. when user cancels (swipe left / back button) this code is no longer
-            //    run and the caller receives null
-            Navigator.pop(context, result.text);
-          },
-        ),
-      );
+    body: ReaderWidget(
+      onScan: (result) {
+        // notes:
+        // 1. even if result.isValid, result.error is always non-null (and set to "")
+        // 2. i've never encountered scan errors to see when they occur, and
+        //    i wouldn't know what to do about them anyway, so we simply return
+        //    result.text in such case (which presumably will be null, or "")
+        // 3. when user cancels (swipe left / back button) this code is no longer
+        //    run and the caller receives null
+        Navigator.pop(context, result.text);
+      },
+    ),
+  );
 }
 
 class IngredientTypeahead extends StatefulWidget {
@@ -65,8 +64,8 @@ class IngredientTypeahead extends StatefulWidget {
   final bool showScanner;
 
   final Function(int id, String name, num? amount) selectIngredient;
-  final Function() unSelectIngredient;
-  final Function(String query) updateSearchQuery;
+  final Function() onDeselectIngredient;
+  final Function(String query) onUpdateSearchQuery;
 
   IngredientTypeahead(
     this._ingredientIdController,
@@ -75,8 +74,8 @@ class IngredientTypeahead extends StatefulWidget {
     this.test = false,
     this.barcode = '',
     required this.selectIngredient,
-    required this.unSelectIngredient,
-    required this.updateSearchQuery,
+    required this.onDeselectIngredient,
+    required this.onUpdateSearchQuery,
   });
 
   @override
@@ -95,8 +94,9 @@ class _IngredientTypeaheadState extends State<IngredientTypeahead> {
 
   Future<String> openBarcodeScan(BuildContext context) async {
     try {
-      final code = await Navigator.of(context)
-          .push<String?>(MaterialPageRoute(builder: (context) => const ScanReader()));
+      final code = await Navigator.of(
+        context,
+      ).push<String?>(MaterialPageRoute(builder: (context) => const ScanReader()));
 
       if (code == null) {
         return '';
@@ -116,7 +116,7 @@ class _IngredientTypeaheadState extends State<IngredientTypeahead> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TypeAheadField<IngredientApiSearchEntry>(
+        TypeAheadField<Ingredient>(
           controller: widget._ingredientController,
           debounceDuration: const Duration(milliseconds: 500),
           builder: (context, controller, focusNode) {
@@ -143,9 +143,8 @@ class _IngredientTypeaheadState extends State<IngredientTypeahead> {
               return null;
             }
 
-            widget.updateSearchQuery(pattern);
-            // unselect to start a new search
-            widget.unSelectIngredient();
+            widget.onUpdateSearchQuery(pattern);
+            widget.onDeselectIngredient();
 
             return Provider.of<NutritionPlansProvider>(context, listen: false).searchIngredient(
               pattern,
@@ -153,26 +152,28 @@ class _IngredientTypeaheadState extends State<IngredientTypeahead> {
               searchEnglish: _searchEnglish,
             );
           },
-          itemBuilder: (context, suggestion) {
-            final url = context.read<NutritionPlansProvider>().baseProvider.auth.serverUrl;
+          itemBuilder: (context, ingredient) {
             return ListTile(
-              leading: suggestion.data.image != null
+              leading: ingredient.image != null
                   ? CircleAvatar(
-                      backgroundImage: NetworkImage(url! + suggestion.data.image!),
+                      backgroundImage: NetworkImage(ingredient.thumbnails!.medium),
                     )
                   : const CircleIconAvatar(
                       Icon(Icons.image, color: Colors.grey),
                     ),
-              title: Text(suggestion.value),
-              // subtitle: Text(suggestion.data.id.toString()),
+              title: Text(
+                ingredient.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
               trailing: IconButton(
                 icon: const Icon(Icons.info_outline),
                 onPressed: () {
                   showIngredientDetails(
                     context,
-                    suggestion.data.id,
+                    ingredient.id,
                     select: () {
-                      widget.selectIngredient(suggestion.data.id, suggestion.value, null);
+                      widget.selectIngredient(ingredient.id, ingredient.name, null);
                     },
                   );
                 },
@@ -183,8 +184,11 @@ class _IngredientTypeaheadState extends State<IngredientTypeahead> {
             opacity: CurvedAnimation(parent: animation, curve: Curves.fastOutSlowIn),
             child: child,
           ),
-          onSelected: (suggestion) {
-            widget.selectIngredient(suggestion.data.id, suggestion.value, null);
+          onSelected: (suggestion) async {
+            // Cache selected ingredient
+            final provider = Provider.of<NutritionPlansProvider>(context, listen: false);
+            await provider.cacheIngredient(suggestion);
+            widget.selectIngredient(suggestion.id, suggestion.name, null);
           },
         ),
         if (Localizations.localeOf(context).languageCode != LANGUAGE_SHORT_ENGLISH)
@@ -217,8 +221,10 @@ class _IngredientTypeaheadState extends State<IngredientTypeahead> {
         showDialog(
           context: context,
           builder: (context) => FutureBuilder<Ingredient?>(
-            future: Provider.of<NutritionPlansProvider>(context, listen: false)
-                .searchIngredientWithCode(barcode),
+            future: Provider.of<NutritionPlansProvider>(
+              context,
+              listen: false,
+            ).searchIngredientWithBarcode(barcode),
             builder: (BuildContext context, AsyncSnapshot<Ingredient?> snapshot) {
               return IngredientScanResultDialog(snapshot, barcode, widget.selectIngredient);
             },
@@ -239,7 +245,7 @@ class IngredientAvatar extends StatelessWidget {
     return ingredient.image != null
         ? GestureDetector(
             child: CircleAvatar(
-              backgroundImage: NetworkImage(ingredient.image!.image),
+              backgroundImage: NetworkImage(ingredient.image!.url),
             ),
             onTap: () async {
               if (ingredient.image!.objectUrl != '') {

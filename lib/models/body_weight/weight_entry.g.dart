@@ -7,19 +7,16 @@ part of 'weight_entry.dart';
 // **************************************************************************
 
 WeightEntry _$WeightEntryFromJson(Map<String, dynamic> json) {
-  $checkKeys(
-    json,
-    requiredKeys: const ['id', 'weight', 'date'],
-  );
+  $checkKeys(json, requiredKeys: const ['id', 'weight', 'date']);
   return WeightEntry(
     id: (json['id'] as num?)?.toInt(),
     weight: stringToNum(json['weight'] as String?),
-    date: json['date'] == null ? null : DateTime.parse(json['date'] as String),
+    date: utcIso8601ToLocalDate(json['date'] as String),
   );
 }
 
 Map<String, dynamic> _$WeightEntryToJson(WeightEntry instance) => <String, dynamic>{
-      'id': instance.id,
-      'weight': numToString(instance.weight),
-      'date': dateToYYYYMMDD(instance.date),
-    };
+  'id': instance.id,
+  'weight': numToString(instance.weight),
+  'date': dateToUtcIso8601(instance.date),
+};

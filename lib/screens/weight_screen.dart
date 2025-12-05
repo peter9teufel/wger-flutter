@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wger/core/wide_screen_wrapper.dart';
 import 'package:wger/l10n/generated/app_localizations.dart';
 import 'package:wger/providers/body_weight.dart';
 import 'package:wger/screens/form_screen.dart';
@@ -32,8 +33,6 @@ class WeightScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lastWeightEntry = context.read<BodyWeightProvider>().getNewestEntry();
-
     return Scaffold(
       appBar: EmptyAppBar(AppLocalizations.of(context).weight),
       floatingActionButton: FloatingActionButton(
@@ -44,14 +43,16 @@ class WeightScreen extends StatelessWidget {
             FormScreen.routeName,
             arguments: FormScreenArguments(
               AppLocalizations.of(context).newEntry,
-              WeightForm(lastWeightEntry?.copyWith(id: null, date: DateTime.now())),
+              WeightForm(),
             ),
           );
         },
       ),
-      body: SingleChildScrollView(
-        child: Consumer<BodyWeightProvider>(
-          builder: (context, provider, child) => WeightOverview(provider),
+      body: WidescreenWrapper(
+        child: SingleChildScrollView(
+          child: Consumer<BodyWeightProvider>(
+            builder: (context, provider, child) => WeightOverview(provider),
+          ),
         ),
       ),
     );

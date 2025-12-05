@@ -30,6 +30,8 @@
 .pub-cache/
 .pub/
 /build/
+/**/build/
+/android/app/.cxx
 **/failures/*.png
 
 # Symbolication related
