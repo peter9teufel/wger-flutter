@@ -408,7 +408,7 @@ class MockExercisesProvider extends _i1.Mock implements _i17.ExercisesProvider {
           as _i18.Future<_i4.Exercise>);
 
   @override
-  _i18.Future<void> initCacheTimesLocalPrefs({dynamic forceInit = false}) =>
+  _i18.Future<void> initCacheTimesLocalPrefs({bool? forceInit = false}) =>
       (super.noSuchMethod(
             Invocation.method(#initCacheTimesLocalPrefs, [], {
               #forceInit: forceInit,
@@ -944,9 +944,17 @@ class MockUserProvider extends _i1.Mock implements _i21.UserProvider {
           as _i14.SharedPreferencesAsync);
 
   @override
-  List<_i21.DashboardWidget> get dashboardOrder =>
+  List<_i21.DashboardWidget> get dashboardWidgets =>
       (super.noSuchMethod(
-            Invocation.getter(#dashboardOrder),
+            Invocation.getter(#dashboardWidgets),
+            returnValue: <_i21.DashboardWidget>[],
+          )
+          as List<_i21.DashboardWidget>);
+
+  @override
+  List<_i21.DashboardWidget> get allDashboardWidgets =>
+      (super.noSuchMethod(
+            Invocation.getter(#allDashboardWidgets),
             returnValue: <_i21.DashboardWidget>[],
           )
           as List<_i21.DashboardWidget>);
@@ -1145,6 +1153,7 @@ class MockWgerBaseProvider extends _i1.Mock implements _i2.WgerBaseProvider {
     Uri? uri, {
     int? maxRetries = 3,
     Duration? initialDelay = const Duration(milliseconds: 250),
+    Duration? timeout = const Duration(seconds: 5),
     String? language,
   }) =>
       (super.noSuchMethod(
@@ -1154,6 +1163,7 @@ class MockWgerBaseProvider extends _i1.Mock implements _i2.WgerBaseProvider {
               {
                 #maxRetries: maxRetries,
                 #initialDelay: initialDelay,
+                #timeout: timeout,
                 #language: language,
               },
             ),
@@ -1162,9 +1172,17 @@ class MockWgerBaseProvider extends _i1.Mock implements _i2.WgerBaseProvider {
           as _i18.Future<dynamic>);
 
   @override
-  _i18.Future<List<dynamic>> fetchPaginated(Uri? uri, {String? language}) =>
+  _i18.Future<List<dynamic>> fetchPaginated(
+    Uri? uri, {
+    String? language,
+    Duration? timeout = const Duration(seconds: 5),
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#fetchPaginated, [uri], {#language: language}),
+            Invocation.method(
+              #fetchPaginated,
+              [uri],
+              {#language: language, #timeout: timeout},
+            ),
             returnValue: _i18.Future<List<dynamic>>.value(<dynamic>[]),
           )
           as _i18.Future<List<dynamic>>);

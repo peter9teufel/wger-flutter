@@ -390,9 +390,17 @@ class MockUserProvider extends _i1.Mock implements _i17.UserProvider {
           as _i4.SharedPreferencesAsync);
 
   @override
-  List<_i17.DashboardWidget> get dashboardOrder =>
+  List<_i17.DashboardWidget> get dashboardWidgets =>
       (super.noSuchMethod(
-            Invocation.getter(#dashboardOrder),
+            Invocation.getter(#dashboardWidgets),
+            returnValue: <_i17.DashboardWidget>[],
+          )
+          as List<_i17.DashboardWidget>);
+
+  @override
+  List<_i17.DashboardWidget> get allDashboardWidgets =>
+      (super.noSuchMethod(
+            Invocation.getter(#allDashboardWidgets),
             returnValue: <_i17.DashboardWidget>[],
           )
           as List<_i17.DashboardWidget>);
@@ -802,7 +810,7 @@ class MockExercisesProvider extends _i1.Mock implements _i20.ExercisesProvider {
           as _i15.Future<_i6.Exercise>);
 
   @override
-  _i15.Future<void> initCacheTimesLocalPrefs({dynamic forceInit = false}) =>
+  _i15.Future<void> initCacheTimesLocalPrefs({bool? forceInit = false}) =>
       (super.noSuchMethod(
             Invocation.method(#initCacheTimesLocalPrefs, [], {
               #forceInit: forceInit,
